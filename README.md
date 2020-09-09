@@ -50,14 +50,4 @@ utd_ = cop.UTD_(0.99)
 
 print(ltd_, utd_)
 
-
-
-p = cop.params
-# cop.params = ...  # you can override parameters too, even after it's fitted!  
-
-# get a summary of the copula. If it's fitted, fit details will be present too
-cop.summary()
-
-# overriding parameters, for Elliptical Copulae, you can override the correlation matrix
-cop[:] = np.eye(8)  # in this case, this will be equivalent to an Independent Copula
 ```
