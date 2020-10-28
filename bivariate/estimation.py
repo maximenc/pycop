@@ -65,4 +65,23 @@ def IAD_dist(copula, data, theta):
     return IAD
 
 
+def AD_dist(copula, data, theta):
 
+    ranks = data
+    order_u = ranks.iloc[:,0].argsort()
+    order_v = ranks.iloc[:,1].argsort()
+    ranks.iloc[:,0] = order_u.argsort()
+    ranks.iloc[:,1] = order_v.argsort()
+
+    def C_emp(i,j,ranks):
+        return 1/n * len(ranks.loc[(ranks.iloc[:,0]<= i ) & (ranks.iloc[:,1] <= j) ])
+
+    n = len(data)
+    AD_lst = []
+    for i in range(1,n):
+        for j in range(1,n):
+            C_ = C_emp(i,j,ranks)
+            C = copula.cdf((i/n),(j/n),theta)
+            term = abs(C_ - C)/np.sqrt(C*(1-C))
+            AD_lst.append(term)
+    return max(AD_lst)

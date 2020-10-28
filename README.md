@@ -17,9 +17,7 @@ for col in df.columns.values:
     df[col] = np.log(df[col]) - np.log(df[col].shift(1))
 df = df.dropna()
 
-
 data = df[["US","UK"]]
-
 
 cop = copula.Archimedean(family='joe')
 param_, cmle = estimation.fit_cmle(cop, data)
