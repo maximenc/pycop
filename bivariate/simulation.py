@@ -1,11 +1,47 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+from scipy import linalg
+from scipy.stats import norm, t
 
 ###
 # See  Genest and MacKay (1986) The joy of copulas: bivariate distributions with uniform marginals
 ### General algorithm to generate pairs of random variables whose distribution function is given by an Archimedean Copula
+
+def simu_gaussian(num, rho):
+    """ 
+    Gaussian Copula 
+
+    """
+    v1 = np.random.normal(0,1,num)
+    v2 = np.random.normal(0,1,num)
+
+    RHO = [[1,rho],[rho, 1]]
+    L = linalg.cholesky(RHO, lower=True)
+    y1, y2 = np.dot(L, [v1, v2])
+    u1 = norm.cdf(y1, 0, 1)
+    u2 = norm.cdf(y2, 0, 1)
+
+    return u1, u2
+
+def simu_tstudent(num, nu, rho):
+    """ 
+    Bivariate student Copula with nu degrees of freedom
+
+    """
+    v1 = np.random.normal(0,1,num)
+    v2 = np.random.normal(0,1,num)
+    RHO = [[1,rho],[rho, 1]]
+    L = linalg.cholesky(RHO, lower=True)
+    y1, y2 = np.sqrt(nu*np.random.chisquare(df=nu,size=num) )*np.dot(L, [v1, v2])
+
+    #np.sqrt(nu*np.random.chisquare(df=nu,size=num) )
+    u1 = t.cdf(y1, df=nu, loc=0, scale=1)
+    u2 = t.cdf(y2, df=nu, loc=0, scale=1)
+
+    return u1, u2
+
+
 
 def simu_clayton(num, theta):
     """
@@ -87,6 +123,15 @@ def simu_gumbel(num, theta):
 
     return u1, u2
 
+
+u1, u2 = simu_gaussian(num=2000, rho=0.5)
+plt.scatter(u1, u2, color="black", alpha=0.8)
+plt.show()
+
+
+u1, u2 = simu_tstudent(num=2000, nu=3, rho=0.5)
+plt.scatter(u1, u2, color="black", alpha=0.8)
+plt.show()
 
 u1, u2 = simu_clayton(num=2000, theta=5)
 plt.scatter(u1, u2, color="black", alpha=0.8)
