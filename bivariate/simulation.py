@@ -10,7 +10,7 @@ from scipy.stats import norm, t
 
 def simu_gaussian(num, rho):
     """ 
-    Gaussian Copula 
+    # Gaussian Copula with correlation rho
 
     """
     v1 = np.random.normal(0,1,num)
@@ -26,16 +26,15 @@ def simu_gaussian(num, rho):
 
 def simu_tstudent(num, nu, rho):
     """ 
-    Bivariate student Copula with nu degrees of freedom
+    # Bivariate student Copula with nu degrees of freedom and correlation rho
 
     """
     v1 = np.random.normal(0,1,num)
     v2 = np.random.normal(0,1,num)
     RHO = [[1,rho],[rho, 1]]
     L = linalg.cholesky(RHO, lower=True)
-    y1, y2 = np.sqrt(nu*np.random.chisquare(df=nu,size=num) )*np.dot(L, [v1, v2])
+    y1, y2 = np.sqrt(nu/np.random.chisquare(df=nu,size=num) )*np.dot(L, [v1, v2])
 
-    #np.sqrt(nu*np.random.chisquare(df=nu,size=num) )
     u1 = t.cdf(y1, df=nu, loc=0, scale=1)
     u2 = t.cdf(y2, df=nu, loc=0, scale=1)
 
@@ -129,7 +128,7 @@ plt.scatter(u1, u2, color="black", alpha=0.8)
 plt.show()
 
 
-u1, u2 = simu_tstudent(num=2000, nu=3, rho=0.5)
+u1, u2 = simu_tstudent(num=3000, nu=1, rho=0.5)
 plt.scatter(u1, u2, color="black", alpha=0.8)
 plt.show()
 
