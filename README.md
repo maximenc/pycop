@@ -48,4 +48,45 @@ utd_ = cop.UTD_(0.99)
 
 print(ltd_, utd_)
 
+
+# Simulation
+import matplotlib.pyplot as plt
+from bivariate import simulation
+
+## Gaussian Copula
+u1, u2 = simulation.simu_gaussian(num=2000, rho=0.5)
+plt.scatter(u1, u2, color="black", alpha=0.8)
+plt.show()
+
+## Gaussian Copula with gaussian marginals
+from scipy.stats import norm
+
+u1, u2 = simulation.simu_gaussian(num=2000, rho=0.5)
+#apply distribution.ppf to transform uniform margin to the desired distribution in scipy.stats
+u1 = norm.ppf(u1)
+u2 = norm.ppf(u2)
+plt.scatter(u1, u2, color="black", alpha=0.8)
+plt.show()
+
+## Student Copula
+u1, u2 = simulation.simu_tstudent(num=3000, nu=1, rho=0.5)
+plt.scatter(u1, u2, color="black", alpha=0.8)
+plt.show()
+
+## Clayton Copula
+u1, u2 = simulation.simu_clayton(num=2000, theta=5)
+plt.scatter(u1, u2, color="black", alpha=0.8)
+plt.show()
+
+## Frank Copula
+u1, u2 = simulation.simu_frank(num=2000, theta=5)
+plt.scatter(u1, u2, color="black", alpha=0.8)
+plt.show()
+
+## Gumbel Copula
+u1, u2 = simulation.simu_gumbel(num=2000, theta=5)
+plt.scatter(u1, u2, color="black", alpha=0.8)
+plt.show()
+
+
 ```

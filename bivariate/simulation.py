@@ -8,6 +8,7 @@ from scipy.stats import norm, t
 # See  Genest and MacKay (1986) The joy of copulas: bivariate distributions with uniform marginals
 ### General algorithm to generate pairs of random variables whose distribution function is given by an Archimedean Copula
 
+
 def simu_gaussian(num, rho):
     """ 
     # Gaussian Copula with correlation rho
@@ -123,24 +124,4 @@ def simu_gumbel(num, theta):
     return u1, u2
 
 
-u1, u2 = simu_gaussian(num=2000, rho=0.5)
-plt.scatter(u1, u2, color="black", alpha=0.8)
-plt.show()
-
-
-u1, u2 = simu_tstudent(num=3000, nu=1, rho=0.5)
-plt.scatter(u1, u2, color="black", alpha=0.8)
-plt.show()
-
-u1, u2 = simu_clayton(num=2000, theta=5)
-plt.scatter(u1, u2, color="black", alpha=0.8)
-plt.show()
-
-u1, u2 = simu_frank(num=2000, theta=5)
-plt.scatter(u1, u2, color="black", alpha=0.8)
-plt.show()
-
-u1, u2 = simu_gumbel(num=2000, theta=5)
-plt.scatter(u1, u2, color="black", alpha=0.8)
-plt.show()
 
