@@ -68,6 +68,17 @@ u2 = norm.ppf(u2)
 plt.scatter(u1, u2, color="black", alpha=0.8)
 plt.show()
 
+## Plot Copula density
+# Empirical
+data = df[["Japan","US"]]
+cop = copula.Empirical(data)
+cop.plot_pdf(Nsplit=50)
+
+# Clayton
+cop = copula.Archimedean(family='clayton')
+cop.plot_pdf(theta=1.5, Nsplit=25)
+cop.plot_cdf(theta=1.5, Nsplit=25)
+
 ## Student Copula
 u1, u2 = simulation.simu_tstudent(num=3000, nu=1, rho=0.5)
 plt.scatter(u1, u2, color="black", alpha=0.8)
