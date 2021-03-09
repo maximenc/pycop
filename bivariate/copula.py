@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import stats
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
 def plot_bivariate(U,V,Z):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -13,8 +15,8 @@ def plot_bivariate(U,V,Z):
 
 class Empirical():
     """
-        Empirical copula 
-        takes pandas Dataframe lenght x rows * 2 columns as Arguments 
+        Bivariate Empirical Copula 
+        Takes a pandas Dataframe which first 2 columns are  
 
     """
     def __init__(self, data):
@@ -29,12 +31,19 @@ class Empirical():
         jth_order_v = np.partition(np.asarray(self.data[col[1]].values), j)[j]
         return (1/self.n) * len(self.data.loc[(self.data[col[0]] <= ith_order_u ) & (self.data[col[1]] <= jth_order_v) ])
 
-    def LTD_(self, i0_n):
-        return self.cdf(i0_n,i0_n)/i0_n
+    def LTDC_(self, i_n):
+        """
+            Lower Tail Dependence Coefficient for a given threshold i/n
 
-    def UTD_(self, i0_n):
-        return ((1-2*i0_n)+self.cdf(i0_n,i0_n))/(1-i0_n)
-       #df = df.fillna(0)
+        """
+        return self.cdf(i_n,i_n)/i_n
+
+    def UTDC_(self, i_n):
+        """
+            Upper Tail Dependence Coefficient for a given threshold i/n
+
+        """
+        return ((1-2*i_n)+self.cdf(i_n,i_n))/(1-i_n)
 
     def plot_cdf(self, Nsplit):
         U_grid = np.linspace(0, 1, Nsplit)[:-1]
@@ -43,7 +52,6 @@ class Empirical():
         Z = np.array( [self.cdf(uu, vv) for uu, vv in zip(np.ravel(U_grid), np.ravel(V_grid)) ] )
         Z = Z.reshape(U_grid.shape)
         plot_bivariate(U_grid,V_grid,Z)
-
 
     def plot_pdf(self, Nsplit):
 
@@ -68,7 +76,66 @@ class Empirical():
         Z = np.array(df)
 
         plot_bivariate(U,V,Z)
+    
+    def optimal_tdc(self, case):
+        """
+            Returns optimal Empirical Tail Dependence coefficient (TDC)
+            Based on the heuristic plateau-finding algorithm from Frahm et al (2005) "Estimating the tail-dependence coefficient: properties and pitfalls"
 
+        """
+
+        data = self.data #creates a copy 
+        data.reset_index(inplace=True,drop=True)
+        #data["TDC"] = np.NaN
+        #data["TDC_smoothed"] = np.NaN
+        n = len(self.data)
+        b = int(n/200) # length to apply a moving average on 2b + 1 consecutive points
+        # b is chosen such that ~1% of the data fall into the mooving average
+
+        if case == "upper":
+            # Compute the Upper TDC for every possible threshold i/n
+            for i in range(1,n-1):
+                data.at[i,"TDC"] = self.UTDC_(i_n=i/n)        
+            data = data.iloc[::-1] # Reverse the order, the plateau finding algorithm starts with lower values
+            data.reset_index(inplace=True,drop=True)
+
+        elif case =="lower":
+            # Compute the Lower TDC for every possible threshold i/n
+            for i in range(1,n-1):
+                data.at[i,"TDC"] = self.LTDC_(i_n=i/n)
+        else:
+            print("Takes \"upper\" or \"lower\" argument only")
+            return None 
+
+        # Smooth the TDC with a mooving average of lenght 2*b+1
+        for i in range(b,n-b):
+            TDC_smooth = 0
+            for j in range(i-b,i+b+1):
+                TDC_smooth = TDC_smooth +data.at[j,"TDC"]
+            TDC_smooth = TDC_smooth/(2*b+1)  
+            data.at[i,"TDC_smoothed"] = TDC_smooth
+
+        m = int(np.sqrt(n-2*b) ) # lenght of the plateau
+        std = data["TDC_smoothed"].std() # the standard deviation of the smoothed series
+        data["cond"] = np.NaN # column that will contains the condition: plateau - 2*sigma
+
+        for k in range(0,n-2*b-m+1):
+            plateau = 0
+            for i in range(k+1,k+m-1+1):
+                plateau = plateau + np.abs(data.at[i,"TDC_smoothed"] - data.at[k,"TDC_smoothed"])
+            data.at[k,"cond"] = plateau - 2*std
+
+        # Finding the first k such that: plateau - 2*sigma <= 0
+        k = data.loc[ data.cond <= 0,:].index[0]
+
+        # The optimal TDC is defined as the average of the corresponding plateau
+        plateau_k = 0
+        for i in range(1,m-1+1):
+            plateau_k = plateau_k + data.at[k+i-1,"TDC_smoothed"] 
+        TDC_ = plateau_k/m
+
+        print("Optimal threshold: ", k/n)
+        return TDC_
 
 
 class Archimedean():
@@ -79,8 +146,8 @@ class Archimedean():
         """
             Creates an Archimedean copula.
             bounds_param = 
-            #x0 = Initial guess. Array of real elements of size (n,), where ‘n’ is the number of independent variables.
-            theta_start #x0 = Initial guess. Array of real elements of size (n,), where ‘n’ is the number of independent variables.
+            #x0 = Initial guess. Array of real elements of size (n,), where 'n' is the number of independent variables.
+
         """
         self.family = family
         if family  in ['clayton', 'galambos', 'plackett', 'rclayton', 'rgalambos'] :
@@ -98,7 +165,7 @@ class Archimedean():
 
     def cdf(self, u, v, theta):
         """
-            returns the cumulative distribution function for the respective archimedean copula
+            returns the cumulative distribution function for the respective archimedean copula family
         """
 
         if self.family == 'clayton':
@@ -195,7 +262,7 @@ class Archimedean():
 
     def LTD(self, theta):
         """
-            returns the lower tail dependence coefficient for the given theta
+            Returns the lower tail dependence coefficient for a given theta
         """
         if self.family  in ['gumbel', 'joe', 'frank', 'galambos', 'fgm', 'plackett', 'rclayton']:
             return 0
@@ -206,7 +273,7 @@ class Archimedean():
 
     def UTD(self, theta):
         """
-            returns the upper tail dependence coefficient 
+            Returns the upper tail dependence coefficient for a given theta
         """
         if self.family  in ['clayton', 'frank', 'fgm', 'plackett', 'rgumbel', 'rjoe', 'rgalambos']:
             return 0
