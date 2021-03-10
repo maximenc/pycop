@@ -10,8 +10,7 @@ def plot_bivariate(U,V,Z):
     ax.plot_surface(U,V,Z)
     plt.show()
 
-
-class Empirical():
+class empirical():
     """
         Bivariate Empirical Copula 
         Takes a pandas Dataframe which first 2 columns are  
@@ -29,14 +28,14 @@ class Empirical():
         jth_order_v = np.partition(np.asarray(self.data[col[1]].values), j)[j]
         return (1/self.n) * len(self.data.loc[(self.data[col[0]] <= ith_order_u ) & (self.data[col[1]] <= jth_order_v) ])
 
-    def LTDC_(self, i_n):
+    def LTDC(self, i_n):
         """
             Lower Tail Dependence Coefficient for a given threshold i/n
 
         """
         return self.cdf(i_n,i_n)/i_n
 
-    def UTDC_(self, i_n):
+    def UTDC(self, i_n):
         """
             Upper Tail Dependence Coefficient for a given threshold i/n
 
@@ -67,7 +66,6 @@ class Empirical():
                 df.at[Xa,Ya] = len(self.data.loc[( Xa <= self.data.iloc[:,0]) & (self.data.iloc[:,0] < Xb) & ( Ya <= self.data.iloc[:,1]) & (self.data.iloc[:,1]< Yb)])
         df.index=df.index+(U_grid[0]-U_grid[1])/2
         df.columns = df.columns+ (V_grid[0]-V_grid[1])/2 
-        print(df)
         df = df /len(self.data)
 
         U, V = np.meshgrid(U_grid, V_grid)   # Create coordinate points of X and Y
@@ -93,14 +91,14 @@ class Empirical():
         if case == "upper":
             # Compute the Upper TDC for every possible threshold i/n
             for i in range(1,n-1):
-                data.at[i,"TDC"] = self.UTDC_(i_n=i/n)        
+                data.at[i,"TDC"] = self.UTDC(i_n=i/n)        
             data = data.iloc[::-1] # Reverse the order, the plateau finding algorithm starts with lower values
             data.reset_index(inplace=True,drop=True)
 
         elif case =="lower":
             # Compute the Lower TDC for every possible threshold i/n
             for i in range(1,n-1):
-                data.at[i,"TDC"] = self.LTDC_(i_n=i/n)
+                data.at[i,"TDC"] = self.LTDC(i_n=i/n)
         else:
             print("Takes \"upper\" or \"lower\" argument only")
             return None 
@@ -136,7 +134,7 @@ class Empirical():
         return TDC_
 
 
-class Archimedean():
+class archimedean():
 
     Archimedean_families = ['clayton', 'gumbel', 'frank', 'joe', 'galambos', 'fgm', 'plackett', 'rgumbel', 'rclayton', 'rjoe', 'rgalambos']
     
@@ -170,13 +168,13 @@ class Archimedean():
             return (u**(-theta)+v**(-theta)-1)**(-1/theta)
 
         elif self.family == 'rclayton':
-            return (u + v - 1 + Archimedean(family='clayton').cdf((1-u),(1-v), theta) )
+            return (u + v - 1 + archimedean(family='clayton').cdf((1-u),(1-v), theta) )
 
         elif self.family == 'gumbel':
             return np.exp(  -( (-np.log(u))**theta + (-np.log(v))**theta )**(1/theta) )
 
         elif self.family == 'rgumbel':
-            return (u + v - 1 + Archimedean(family='gumbel').cdf((1-u),(1-v), theta) )
+            return (u + v - 1 + archimedean(family='gumbel').cdf((1-u),(1-v), theta) )
 
         elif self.family == 'frank':
             a = 1-np.exp(-theta)-(1-np.exp(-theta*u)*(1-np.exp(-theta*v) ) )
@@ -188,13 +186,13 @@ class Archimedean():
             return 1-(u_**theta+v_**theta-(u_**theta)*(v_**theta))**(1/theta)
 
         elif self.family == 'rjoe':
-            return (u + v - 1 + Archimedean(family='joe').cdf((1-u),(1-v), theta) )
+            return (u + v - 1 + archimedean(family='joe').cdf((1-u),(1-v), theta) )
 
         elif self.family == 'galambos':
             return u*v*np.exp(((-np.log(u))**(-theta)+(-np.log(v))**(-theta))**(-1/theta) )
 
         elif self.family == 'rgalambos':
-            return (u + v - 1 + Archimedean(family='galambos').cdf((1-u),(1-v), theta) )
+            return (u + v - 1 + archimedean(family='galambos').cdf((1-u),(1-v), theta) )
 
         elif self.family == 'fgm':
             return u*v*(1+theta*(1-u)*(1-v))
@@ -212,7 +210,7 @@ class Archimedean():
             return ((theta+1)*(u*v)**(-theta-1))*((u**(-theta)+v**(-theta)-1)**(-2-1/theta))
 
         if self.family == 'rclayton':
-            return Archimedean(family='clayton').pdf((1-u),(1-v), theta)
+            return archimedean(family='clayton').pdf((1-u),(1-v), theta)
 
         elif self.family == 'gumbel':
             a = np.power(np.multiply(u, v), -1)
@@ -220,10 +218,10 @@ class Archimedean():
             b = np.power(tmp, -2 + 2.0 / theta)
             c = np.power(np.multiply(np.log(u), np.log(v)), theta - 1)
             d = 1 + (theta - 1) * np.power(tmp, -1.0 / theta)
-            return Archimedean(family='gumbel').cdf(u,v, theta) * a * b * c * d
+            return archimedean(family='gumbel').cdf(u,v, theta) * a * b * c * d
 
         if self.family == 'rgumbel':
-            return Archimedean(family='gumbel').pdf((1-u),(1-v), theta)
+            return archimedean(family='gumbel').pdf((1-u),(1-v), theta)
 
         elif self.family == 'frank':
             a = theta*(1-np.exp(-theta))*np.exp(-theta*(u+v))
@@ -238,7 +236,7 @@ class Archimedean():
             return a*b
 
         if self.family == 'rjoe':
-            return Archimedean(family='joe').pdf((1-u),(1-v), theta)
+            return archimedean(family='joe').pdf((1-u),(1-v), theta)
 
         elif self.family == 'galambos':
             x = -np.log(u)
@@ -247,7 +245,7 @@ class Archimedean():
             + ((x**(-theta) +y**(-theta))**(-2-1/theta))*((x*y)**(-theta-1))*(1+theta+(x**(-theta) +y**(-theta))**(-1/theta)))
 
         if self.family == 'rgalambos':
-            return Archimedean(family='galambos').pdf((1-u),(1-v), theta)
+            return archimedean(family='galambos').pdf((1-u),(1-v), theta)
 
         elif self.family == 'fgm':
             return 1+theta*(1-2*u)*(1-2*v)
@@ -258,7 +256,7 @@ class Archimedean():
             b = ((1+eta*(u+v))**2-4*theta*eta*u*v)**(3/2)
             return a/b
 
-    def LTD(self, theta):
+    def LTDC(self, theta):
         """
             Returns the lower tail dependence coefficient for a given theta
         """
@@ -269,7 +267,7 @@ class Archimedean():
         elif self.family  in ['rgumbel', 'rjoe'] :
             return 2-2**(1/theta)
 
-    def UTD(self, theta):
+    def UTDC(self, theta):
         """
             Returns the upper tail dependence coefficient for a given theta
         """
@@ -299,7 +297,7 @@ class Archimedean():
         plot_bivariate(U_grid,V_grid,Z)
 
 
-class Mix2Copula():
+class mix2Copula():
     """
         Creates a Copula from a mix of 2 families of Archimedean Copulas
     """
@@ -307,8 +305,8 @@ class Mix2Copula():
     def __init__(self, family1, family2):
         self.family1 = family1
         self.family2 = family2
-        self.cop1 = Archimedean(family=family1)
-        self.cop2 = Archimedean(family=family2)
+        self.cop1 = archimedean(family=family1)
+        self.cop2 = archimedean(family=family2)
         self.bounds_param = ((0,1), self.cop1.bounds_param[0], self.cop2.bounds_param[0])
         self.theta_start = (np.array(0.5), self.cop1.theta_start, self.cop2.theta_start)
 
@@ -318,10 +316,10 @@ class Mix2Copula():
     def pdf(self, u, v,param):
         return param[0]*(self.cop1.pdf(u,v,param[1]))+(1-param[0])*(self.cop2.pdf(u,v,param[2]))
 
-    def LTD(self, w1, theta1):
+    def LTDC(self, w1, theta1):
         return self.cop1.LTD(theta1)*w1
 
-    def UTD(self, w1, theta2):
+    def UTDC(self, w1, theta2):
         return self.cop2.UTD(theta2)*(1-w1)
 
     def plot_pdf(self, param, Nsplit):
@@ -342,7 +340,7 @@ class Mix2Copula():
         Z = Z.reshape(U_grid.shape)
         plot_bivariate(U_grid,V_grid,Z)
 
-class Mix3Copula():
+class mix3Copula():
     """
         Creates a Copula from a mix of 3 families of Archimedean Copulas
     """
@@ -351,9 +349,9 @@ class Mix3Copula():
         self.family1 = family1
         self.family2 = family2
         self.family3 = family3
-        self.cop1 = Archimedean(family=family1)
-        self.cop2 = Archimedean(family=family2)
-        self.cop3 = Archimedean(family=family3)
+        self.cop1 = archimedean(family=family1)
+        self.cop2 = archimedean(family=family2)
+        self.cop3 = archimedean(family=family3)
 
         self.bounds_param = ((0,1), (0,1), self.cop1.bounds_param[0], self.cop2.bounds_param[0], self.cop3.bounds_param[0])
         self.theta_start = (np.array(0.33), np.array(0.33), self.cop1.theta_start, self.cop2.theta_start, self.cop3.theta_start)
@@ -364,9 +362,9 @@ class Mix3Copula():
     def pdf(self, u, v,param):
         return param[0]*(self.cop1.pdf(u,v,param[2])) + param[1]*(self.cop2.pdf(u,v,param[3])) + (1-param[0]-param[1])*(self.cop3.pdf(u,v,param[4]))
 
-    def LTD(self, w1, theta1):
+    def LTDC(self, w1, theta1):
         return self.cop1.LTD(theta1)*w1
 
-    def UTD(self, w3, theta3):
+    def UTDC(self, w3, theta3):
         return self.cop3.UTD(theta3)*w3
 

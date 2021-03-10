@@ -4,8 +4,8 @@ from scipy.optimize import minimize
 
 def pseudo_obs(data):
     """
-    take dataframe as argument and returns 
-    # Pseudo-observations from real data X
+        take dataframe as argument and returns 
+        Pseudo-observations from real data X
     """
     pseudo_obs = data
     for i in range(len(data.columns)):

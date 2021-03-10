@@ -1,2 +1,6 @@
 
-bivariate/__pycache__/
+pycop/bivariate/__pycache__/
+pyproject.toml
+setup.cfg
+tests/
+dist/
