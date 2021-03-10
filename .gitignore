@@ -6,3 +6,4 @@ pyproject.toml
 setup.cfg
 tests/
 dist/
+build/

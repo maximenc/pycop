@@ -1,8 +1,0 @@
-README.md
-pyproject.toml
-setup.cfg
-pycop/__init__.py
-pycop.egg-info/PKG-INFO
-pycop.egg-info/SOURCES.txt
-pycop.egg-info/dependency_links.txt
-pycop.egg-info/top_level.txt
