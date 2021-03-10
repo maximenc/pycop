@@ -1,5 +1,7 @@
 
 pycop/bivariate/__pycache__/
+pycop.egg-info
+build/lib/pycop
 pyproject.toml
 setup.cfg
 tests/
