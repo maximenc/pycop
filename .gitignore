@@ -1,5 +1,6 @@
 
 pycop/bivariate/__pycache__/
+pycop/__pycache__/
 pycop.egg-info
 build/lib/pycop
 pyproject.toml
