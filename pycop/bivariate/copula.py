@@ -113,9 +113,9 @@ class empirical():
 
         m = int(np.sqrt(n-2*b) ) # lenght of the plateau
         std = data["TDC_smoothed"].std() # the standard deviation of the smoothed series
-        data["cond"] = np.NaN # column that will contains the condition: plateau - 2*sigma
+        #data["cond"] = np.NaN # column that will contains the condition: plateau - 2*sigma
 
-        for k in range(0,n-2*b-m+1):
+        for k in range(0,n-2*b-m+1): #change the range from 0 ?
             plateau = 0
             for i in range(k+1,k+m-1+1):
                 plateau = plateau + np.abs(data.at[i,"TDC_smoothed"] - data.at[k,"TDC_smoothed"])

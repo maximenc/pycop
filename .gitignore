@@ -1,5 +1,6 @@
 
 pycop/bivariate/__pycache__/
+pycop/multivariate/__pycache__/
 pycop/__pycache__/
 pycop.egg-info
 build/lib/pycop
@@ -8,3 +9,6 @@ setup.cfg
 tests/
 dist/
 build/
+
+test.py
+pycop\multivariate\__pycache__\simulation.cpython-37.pyc
