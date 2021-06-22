@@ -21,26 +21,30 @@ class empirical():
         self.n = len(data)
 
     def cdf(self, i_n, j_n):
-        i = int(self.n * i_n)
-        j = int(self.n * j_n)
-        col = [self.data.columns.values[0], self.data.columns.values[1]]
-        ith_order_u = np.partition(np.asarray(self.data[col[0]].values), i)[i]
-        jth_order_v = np.partition(np.asarray(self.data[col[1]].values), j)[j]
-        return (1/self.n) * len(self.data.loc[(self.data[col[0]] <= ith_order_u ) & (self.data[col[1]] <= jth_order_v) ])
+        i = int(round(self.n * i_n))
+        j = int(round(self.n * j_n))
+        ith_order_u = sorted(np.asarray(self.data.iloc[:,0].values))[i-1]
+        jth_order_v = sorted(np.asarray(self.data.iloc[:,1].values))[j-1]
+        return (1/self.n) * len(self.data.loc[(self.data.iloc[:,0] <= ith_order_u ) & (self.data.iloc[:,1] <= jth_order_v) ])
 
     def LTDC(self, i_n):
         """
             Lower Tail Dependence Coefficient for a given threshold i/n
-
         """
-        return self.cdf(i_n,i_n)/i_n
+        i = int(round(self.n * i_n))
+
+        if i == 0:
+            return 0
+        return self.cdf(i_n,i_n)/(i/self.n)
 
     def UTDC(self, i_n):
         """
             Upper Tail Dependence Coefficient for a given threshold i/n
-
         """
-        return ((1-2*i_n)+self.cdf(i_n,i_n))/(1-i_n)
+        i = int(round(self.n * i_n))
+        if i == 0:
+            return 0
+        return (1- 2*(i/self.n) + self.cdf(i_n,i_n) ) / (1-(i/self.n))
 
     def plot_cdf(self, Nsplit):
         U_grid = np.linspace(0, 1, Nsplit)[:-1]

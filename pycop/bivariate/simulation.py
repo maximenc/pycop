@@ -86,19 +86,7 @@ def simu_fgm(num, theta):
 
     return u1, u2
 
-def simu_stable(alpha, beta, gamma, delta, num):
-    # REF : Univariate Stable Distributions: Models for Heavy Tailed Data
-    T = np.random.uniform(-np.pi/2,np.pi/2,num)
-    W = np.array([np.random.exponential(scale=1.0) for i in range(0,num)])
-    T_0 = np.arctan(beta * np.tan(np.pi *alpha*0.5) )/alpha
-
-    if alpha == 1:
-        Z = 2/np.pi *( (2/np.pi + beta*T)*np.tan(T) - beta*np.log( ( 2/np.pi * W * np.cos(T) )/( 2/np.pi + beta*T) ) )
-
-    else:
-        Z = ( (np.sin(alpha)*(T_0+T)) /( (np.cos(alpha)*T_0*np.cos(T) )**(1/alpha) ) )  * ((np.cos(alpha*T_0+(1-alpha)*T)/W )**((1-alpha)/alpha))
-
-    return Z
+from scipy.stats import levy_stable
 
 def simu_gumbel(num, theta):
     """
@@ -112,7 +100,7 @@ def simu_gumbel(num, theta):
     beta = 1
     gamma =1
     delta = 0
-    X = simu_stable(alpha,beta,gamma,delta, num)
+    X = levy_stable.rvs(alpha=1/theta, beta=1,scale=(np.cos(np.pi/(2*theta)))**theta,loc=0, size=num)
 
     v1 = np.array([np.random.exponential(scale=1.0) for i in range(0,num)])
     v2 = np.array([np.random.exponential(scale=1.0) for i in range(0,num)])
@@ -123,5 +111,48 @@ def simu_gumbel(num, theta):
 
     return u1, u2
 
+from scipy.special import gamma, comb
 
 
+def SimuSibuya(alpha, m):
+    """
+        Sibuya distribution Sibuya(α)
+        Used for sampling F=Sibuya(α) for Joe copula 
+        The algorithm in given in Proposition 3.2 in Hofert (2011) "Efficiently sampling nested Archimedean copulas"
+    """
+
+    G_1 = lambda y: ((1-y)*gamma(1-alpha) )**(-1/alpha)
+    F = lambda n: 1- ((-1)**n)*comb(n,alpha-1)
+
+    X = np.random.uniform(0,1,m)
+
+    for i in range(0,len(X)):
+        if X[i] <= alpha:
+            X[i] = 1
+
+        if F(np.floor(G_1(X[i]))) < X[i]:
+            X[i] = np.ceil(G_1(X[i]))
+        else:
+            X[i] = np.floor(G_1(X[i]))
+    return X
+
+
+def simu_joe(num, theta):
+    """
+    # Joe copula
+    Requires:
+        n = number of variables to generate
+        m = sample size
+        theta = Joe copula parameter
+    """
+
+    alpha = 1/theta
+    X = SimuSibuya(alpha, num)
+
+    v = [np.random.uniform(0,1,num) for i in range(0,2)]
+
+    phi_t = lambda t: (1-(1-np.exp(-t))**(1/theta))
+
+    u = [phi_t(-np.log(v[i])/X) for i in range(0,2)]
+
+    return u
