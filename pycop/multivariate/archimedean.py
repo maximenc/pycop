@@ -1,3 +1,4 @@
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -5,13 +6,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy import stats
 from mpmath import polylog
 from scipy.special import gamma
-
-def plot_bivariate(U,V,Z):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(U,V,Z)
-    plt.show()
-
 
 class archimedean():
     
@@ -55,25 +49,4 @@ class archimedean():
 
         self.logl = lambda theta, uj : np.log( ((-1)**d) *self.phit_d(theta, self.d, sum([self.phit_inv(theta, uij) for uij in uj])) ) + sum([np.log(-self.phit_invp(theta, uij)) for uij in uj])
 
-    def plot_pdf(self, theta, Nsplit):
 
-        U_grid = np.linspace(0, 1, Nsplit)
-        V_grid = np.linspace(0, 1, Nsplit)
-        U_grid, V_grid = np.meshgrid(U_grid, V_grid)
-        x = np.ravel(U_grid), np.ravel(V_grid)
-
-        Z = np.array( [self.pdf(theta, (ui, vi)) for ui, vi in zip(U_grid, V_grid) ] )
-
-        Z = Z.reshape(U_grid.shape)
-        plot_bivariate(U_grid,V_grid,Z)
-
-    def plot_cdf(self, theta, Nsplit):
-        U_grid = np.linspace(0, 1, Nsplit)
-        V_grid = np.linspace(0, 1, Nsplit)
-        U_grid, V_grid = np.meshgrid(U_grid, V_grid)
-        x = np.ravel(U_grid), np.ravel(V_grid)
-
-        Z = np.array( [self.cdf(theta, (ui, vi)) for ui, vi in zip(U_grid, V_grid) ] )
-
-        Z = Z.reshape(U_grid.shape)
-        plot_bivariate(U_grid,V_grid,Z)

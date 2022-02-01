@@ -112,7 +112,7 @@ def SimuSibuya(alpha, m):
     """
         Sibuya distribution Sibuya(α)
         Used for sampling F=Sibuya(α) for Joe copula 
-        The algorithm in given in Proposition 3.2 in Hofert (2011) "Efficiently sampling nested Archimedean copulas"
+        The algorithm is given in Proposition 3.2 in Hofert (2011) "Efficiently sampling nested Archimedean copulas"
     """
 
     G_1 = lambda y: ((1-y)*gamma(1-alpha) )**(-1/alpha)
