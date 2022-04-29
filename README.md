@@ -1,5 +1,5 @@
 <p align="center">
-<img src="docs/images/logo_pycop.svg" width="40%" height="40%" />
+<img src="https://github.com/maximenc/pycop/raw/master/docs/images/logo_pycop.svg" width="40%" height="40%" />
 </p>
 
 
@@ -95,8 +95,8 @@ cop.plot_pdf([2], type="3d", Nsplit=100, cmap="cividis" )
 
 
 <p align="center">
-  <img src="docs/images/plot/gumbel_3d_cdf.svg" width="45%" />
-  <img src="docs/images/plot/gumbel_3d_pdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/gumbel_3d_cdf.svg" width="45%" />
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/gumbel_3d_pdf.svg" width="45%" /> 
 </p>
 
 
@@ -113,8 +113,8 @@ cop.plot_pdf([2], type="contour", Nsplit=100, )
 
 
 <p align="center">
-  <img src="docs/images/plot/plackett_contour_cdf.svg" width="45%" />
-  <img src="docs/images/plot/plackett_contour_pdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/plackett_contour_cdf.svg" width="45%" />
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/plackett_contour_pdf.svg" width="45%" /> 
 </p>
 
 
@@ -150,8 +150,8 @@ cop.plot_mpdf([2], marginals, type="contour", Nsplit=100,  lvls=lvls)
 
 
 <p align="center">
-  <img src="docs/images/plot/clayton_3d_mpdf.svg" width="45%" />
-  <img src="docs/images/plot/clayton_contour_mpdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/clayton_3d_mpdf.svg" width="45%" />
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/clayton_contour_mpdf.svg" width="45%" /> 
 </p>
 
 ## Mixture plot
@@ -167,8 +167,8 @@ cop.plot_pdf([0.2, 2, 2],  type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6
 cop.plot_mpdf([0.2, 2, 2], marginals, type="contour", Nsplit=50)
 ``` 
 <p align="center">
-  <img src="docs/images/plot/2c_mixture_contour_pdf.svg" width="45%" />
-  <img src="docs/images/plot/2c_mixture_contour_mpdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/2c_mixture_contour_pdf.svg" width="45%" />
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/2c_mixture_contour_mpdf.svg" width="45%" /> 
 </p>
 
 
@@ -179,8 +179,8 @@ cop.plot_pdf([1/3, 1/3, 1/3, 2, 0.5, 4],  type="contour", Nsplit=40,  lvls=[0.1,
 cop.plot_mpdf([1/3, 1/3, 1/3, 2, 0.5, 2], marginals, type="contour", Nsplit=50)
 ```
 <p align="center">
-  <img src="docs/images/plot/3c_mixture_contour_pdf.svg" width="45%" />
-  <img src="docs/images/plot/3c_mixture_contour_mpdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/3c_mixture_contour_pdf.svg" width="45%" />
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/3c_mixture_contour_mpdf.svg" width="45%" /> 
 </p>
 
 
@@ -214,8 +214,8 @@ u1, u2 = simulation.simu_tstudent(n, m, corrMatrix, nu=1)
 
 
 <p align="center">
-  <img src="docs/images/simu/gaussian_simu.svg" width="45%" />
-  <img src="docs/images/simu/student_simu.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/gaussian_simu.svg" width="45%" />
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/student_simu.svg" width="45%" /> 
 </p>
 
 
@@ -239,8 +239,8 @@ u1, u2 = 1 - u1, 1 - u2
 
 
 <p align="center">
-  <img src="docs/images/simu/gumbel_simu.svg" width="45%" />
-  <img src="docs/images/simu/rgumbel_simu.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/gumbel_simu.svg" width="45%" />
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/rgumbel_simu.svg" width="45%" /> 
 </p>
 
 
@@ -257,7 +257,7 @@ u = simulation.simu_gaussian(n, m, corrMatrix)
 u = norm.ppf(u)
 ```
 <p align="center">
-  <img src="docs/images/simu/gaussian_simu_n3.svg" width="45%" />
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/gaussian_simu_n3.svg" width="45%" />
 </p>
 
 
@@ -267,7 +267,7 @@ u = norm.ppf(u)
 ```
 
 <p align="center">
-  <img src="docs/images/simu/clayton_simu_n3.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/clayton_simu_n3.svg" width="45%" /> 
 </p>
 
 ## Mixture simulation
@@ -287,7 +287,7 @@ u = simulation.simu_mixture(n, m, combination)
 u = norm.ppf(u)
 ```
 <p align="center">
-  <img src="docs/images/simu/2c_mixture_simu.svg" width="45%" />
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/2c_mixture_simu.svg" width="45%" />
 </p>
 
 Simulation from a mixture of 3 copulas
@@ -306,7 +306,7 @@ u = norm.ppf(u)
 ```
 
 <p align="center">
-  <img src="docs/images/simu/3c_mixture_simu.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/3c_mixture_simu.svg" width="45%" /> 
 </p>
 
 
