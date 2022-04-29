@@ -1,21 +1,12 @@
-
 import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.cm as cm
-import matplotlib.mlab as mlab
-import matplotlib
 
 
 
-def plot_bivariate(U,V,Z):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(U,V,Z)
-    plt.show()
+
 
 def empirical_density_contourplot(u, v, lims):
-
+    
     res = 10
 
     pts = np.array([u,v])
@@ -45,10 +36,7 @@ def empirical_density_contourplot(u, v, lims):
 
 
 def empiricalplot(u, contour=True):
-    """
-        Plot the multivariate empirical 
 
-    """
     minu = min([min(ui) for ui in u])
     maxu = max([max(ui) for ui in u])
     setplenght = maxu-minu
@@ -56,7 +44,6 @@ def empiricalplot(u, contour=True):
     lowerticks = [minu,minu+0.2*setplenght,minu+0.4*setplenght]
     upperticks = [minu+0.6*setplenght,minu+0.8*setplenght,maxu]
     limticks = [minu-0.1*setplenght, maxu+0.1*setplenght]
-    
 
     n=len(u)
     for i in range(0,n):
@@ -103,4 +90,6 @@ def empiricalplot(u, contour=True):
 
     plt.subplots_adjust(bottom=0.02, right=0.98, top=0.98, left=0.02, wspace=0.0, hspace=0.0)
     plt.show()
+
+
 

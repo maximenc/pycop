@@ -1,4 +1,2 @@
-from pycop.bivariate import copula
-from pycop.bivariate import simulation
-from pycop.bivariate import estimation
-from pycop.multivariate import copula
+from pycop import simulation, utils
+from pycop.bivariate import archimedean, empirical, estimation, gaussian, student, mixture

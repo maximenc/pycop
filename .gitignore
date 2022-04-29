@@ -9,5 +9,3 @@ setup.cfg
 tests/
 dist/
 build/
-
-test.py

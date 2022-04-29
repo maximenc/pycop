@@ -1,24 +1,48 @@
+import numpy as np
 from scipy.stats import t
 from scipy.special import gamma
-import numpy as np
 
 from copula import copula
-
-
-
 class student(copula):
+    """
+    # Creates a student copula object
 
+    The multivariate student CDF has no analytic expression but it can be
+    approximated numerically
+
+    ...
+
+    Attributes
+    ----------
+    family : str
+        = "student"
+
+    Methods
+    -------
+
+    get_pdf(u, v, rho)
+        Computes the Probability Density Function (PDF).
+    """
+
+    
     def __init__(self):
+        # the `student` copula class inherit the `copula` class
         super().__init__()
+        self.family = "student"
 
+    def get_pdf(self, u, v, param):
         """
-            The multivariate student distribution CDF has no analytic expression but it can be approximated numerically
+        # Computes the PDF
+
+        Parameters
+        ----------
+        u, v : float
+            Values of the marginal CDFs 
+        param : list
+            A list that contains the correlation coefficient rho ∈ [-1,1] and
+            nu > 0, the degrees of freedom.
         """
 
-    def pdf(self, u, v, param):
-        """
-            returns the density
-        """
         rho = param[0]
         nu = param[1]
         y = t.ppf((u, v), df=nu)

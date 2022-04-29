@@ -1,18 +1,68 @@
 import numpy as np
 import pandas as pd
 
+import matplotlib.pyplot as plt
+
+def plot_bivariate(U,V,Z):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(U,V,Z)
+    plt.show()
 
 class empirical():
     """
-        Bivariate Empirical Copula 
-        Takes a pandas Dataframe which first 2 columns are  
+    # A class used to create an Empirical copula object 
 
+    ...
+
+    Attributes
+    ----------
+    data : pandas dataframe
+        A dataframe with two columns that corresponds to the observations
+    n : int
+        The number of observations
+
+    Methods
+    -------
+    cdf(i_n, j_n)
+        Compute the empirical Cumulative Distribution Function (CDF)
+    pdf(i_n, j_n)
+        Compute the empirical Probability Density Function (PDF)
+    plot_cdf(Nsplit)
+        Plot the empirical CDF
+    plot_pdf(Nsplit)
+        Plot the empirical PDF
+    LTDC(i_n)
+        Compute the lower Tail Dependence Coefficient (TDC) for a given threshold i/n
+    UTDC(i_n)
+        Compute the upper Tail Dependence Coefficient (TDC) for a given threshold i/n
+    optimal_tdc(case)
+        Compute the lower or upper TDC accoring to Frahm et al (2005) algorithm.
     """
+
     def __init__(self, data):
+        """
+        Parameters
+        ----------
+        data : pandas dataframe
+            A dataframe with two columns that corresponds to the observations.
+        """
         self.data = data
         self.n = len(data)
+        
 
     def cdf(self, i_n, j_n):
+        """
+        # Compute the CDF
+
+        Parameters
+        ----------
+        i_n : float
+            The threshold to compute the univariate distribution for the first vector.
+        j_n : float
+            The threshold to compute the univariate distribution for the second vector.
+        """
+
         i = int(round(self.n * i_n))
         j = int(round(self.n * j_n))
         ith_order_u = sorted(np.asarray(self.data.iloc[:,0].values))[i-1]
@@ -21,8 +71,14 @@ class empirical():
 
     def LTDC(self, i_n):
         """
-            Lower Tail Dependence Coefficient for a given threshold i/n
+        # Compute the empirical lower TDC for a given threshold i/n
+
+        Parameters
+        ----------
+        i_n : float
+            The threshold to compute the TDC
         """
+
         i = int(round(self.n * i_n))
 
         if i == 0:
@@ -31,25 +87,52 @@ class empirical():
 
     def UTDC(self, i_n):
         """
-            Upper Tail Dependence Coefficient for a given threshold i/n
+        # Compute the empirical upper TDC for a given threshold i/n
+
+        Parameters
+        ----------
+        i_n : float
+            The threshold to compute the TDC
         """
+
         i = int(round(self.n * i_n))
         if i == 0:
             return 0
         return (1- 2*(i/self.n) + self.cdf(i_n,i_n) ) / (1-(i/self.n))
 
     def plot_cdf(self, Nsplit):
+        """
+        # Plot the empirical CDF
+
+        Parameters
+        ----------
+        Nsplit : The number of splits used to compute the grid
+        """
         U_grid = np.linspace(0, 1, Nsplit)[:-1]
         V_grid = np.linspace(0, 1, Nsplit)[:-1]
         U_grid, V_grid = np.meshgrid(U_grid, V_grid)
-        Z = np.array( [self.cdf(uu, vv) for uu, vv in zip(np.ravel(U_grid), np.ravel(V_grid)) ] )
+        Z = np.array( 
+            [self.cdf(uu, vv) for uu, vv in zip(np.ravel(U_grid), np.ravel(V_grid)) ] )
         Z = Z.reshape(U_grid.shape)
         plot_bivariate(U_grid,V_grid,Z)
 
     def plot_pdf(self, Nsplit):
+        """
+        # Plot the empirical PDF
+        
+        Parameters
+        ----------
+        Nsplit : The number of splits used to compute the grid
+        """
 
-        U_grid = np.linspace(min(self.data.iloc[:,0]), max(self.data.iloc[:,0]), Nsplit)
-        V_grid = np.linspace(min(self.data.iloc[:,1]), max(self.data.iloc[:,1]), Nsplit)
+        U_grid = np.linspace(
+            min(self.data.iloc[:,0]),
+            max(self.data.iloc[:,0]),
+            Nsplit)
+        V_grid = np.linspace(
+            min(self.data.iloc[:,1]),
+            max(self.data.iloc[:,1]),
+            Nsplit)
 
         df = pd.DataFrame(index=U_grid, columns=V_grid)
         df = df.fillna(0)
@@ -71,12 +154,16 @@ class empirical():
     
     def optimal_tdc(self, case):
         """
+        # Compute the optimal Empirical Tail Dependence coefficient (TDC)
+        
+        The algorithm is based on the heuristic plateau-finding algorithm 
+        from Frahm et al (2005) "Estimating the tail-dependence coefficient:
+        properties and pitfalls"
 
-            Returns optimal Empirical Tail Dependence coefficient (TDC)
-            Based on the heuristic plateau-finding algorithm from Frahm et al (2005) "Estimating the tail-dependence coefficient: properties and pitfalls"
-            Parameters:
-                case: str
-                     "upper" or "lower" for upper TDC or lower TDC
+        Parameters
+        ----------
+        case: str
+            takes "upper" or "lower" for upper TDC or lower TDC
         """
 
         data = self.data #creates a copy 

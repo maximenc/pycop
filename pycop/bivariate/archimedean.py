@@ -1,72 +1,112 @@
 import numpy as np
-import pandas as pd
-from scipy import stats
-
 from copula import copula
 
-
-
 class archimedean(copula):
+    """
+    # Creates an Archimedean copula objects
 
-    Archimedean_families = ['clayton', 'gumbel', 'frank', 'joe', 'galambos', 'fgm', 'plackett', 'rgumbel', 'rclayton', 'rjoe', 'rgalambos', 'BB1', 'BB2']
+    ...
+
+    Attributes
+    ----------
+    family : str
+        The name of the Archimedean copula function.
+    type : str
+        The type of copula = "archimedean".
+    bounds_param : list
+        A list that contains the domain of the parameter(s) in a tuple.
+        Exemple : [(lower, upper)]
+    parameters_start : array 
+        Value(s) of the initial guess when estimating the copula parameter(s).
+        It represents the parameter `x0` in the `scipy.optimize.minimize` function.
+
+    Methods
+    -------
+    get_cdf(u, v, param)
+        Computes the Cumulative Distribution Function (CDF).
+    get_pdf(u, v, param)
+        Computes the Probability Density Function (PDF).
+    LTDC(theta)
+        Computes the Lower Tail Dependence Coefficient (TDC).
+    UTDC(theta)
+        Computes the upper TDC.
+    """
+
+    Archimedean_families = [
+        'clayton', 'gumbel', 'frank', 'joe', 'galambos','fgm', 'plackett',
+        'rgumbel', 'rclayton', 'rjoe','rgalambos', 'BB1', 'BB2']
     
+
     def __init__(self, family):
         """
-            Creates an Archimedean copula.
-            bounds_param = 
-            #x0 = Initial guess. Array of real elements of size (n,), where 'n' is the number of independent variables.
+        Parameters
+        ----------
+        family : str
+            The name of the Archimedean copula function.
 
+        Raises
+        ------
+        ValueError
+            If the given `family` is not supported.
         """
+
+        # the `archimedean` copula class inherit the `copula` class
         super().__init__()
         self.family = family
+        self.type = "archimedean"
 
         if family  in ['clayton', 'galambos', 'plackett', 'rclayton', 'rgalambos'] :
             self.bounds_param = [(0+ 1e-6, None)]
-            self.theta_start = np.array(0.5)
+            self.parameters_start = np.array(0.5)
 
         elif family in ['gumbel', 'joe', 'rgumbel', 'rjoe'] :
             self.bounds_param = [(1, None)]
-            self.theta_start = np.array(1.5)
+            self.parameters_start = np.array(1.5)
 
         elif family == 'frank':
-            self.bounds_param = [(None)]
-            self.theta_start = np.array(2)
+            self.bounds_param = [(None, None)]
+            self.parameters_start = np.array(2)
 
         elif family == 'fgm':
             self.bounds_param = [(-1, 1-1e-6)]
-            self.theta_start = np.array(0)
+            self.parameters_start = np.array(0)
 
         elif family  in ['BB1'] :
             self.bounds_param1 = [(1, None)]
             self.bounds_param2 = [(0, None)]
-            self.theta_start1 = np.array(1.5)
-            self.theta_start2 = np.array(0.5)
+            self.parameters_start = (np.array(1.5), np.array(0.5))
 
         elif family  in ['BB2'] :
             self.bounds_param1 = [(0, None)]
             self.bounds_param2 = [(0, None)]
-            self.theta_start1 = np.array(0.5)
-            self.theta_start2 = np.array(0.5)
+            self.parameters_start = (np.array(0.5), np.array(0.5))
         else:
             print("family \"%s\" not in list: %s" % (family, archimedean.Archimedean_families) )
             raise ValueError
 
-    def cdf(self, u, v, param):
+    def get_cdf(self, u, v, param):
         """
-            returns the cumulative distribution function for the respective archimedean copula family
+        # Computes the CDF
+
+        Parameters
+        ----------
+        u, v : float
+            Values of the marginal CDFs 
+        param : list
+            A list that contains the copula parameter(s) (float)
         """
 
         if self.family == 'clayton':
             return (u**(-param[0])+v**(-param[0])-1)**(-1/param[0])
 
         elif self.family == 'rclayton':
-            return (u + v - 1 + archimedean(family='clayton').cdf((1-u),(1-v), param) )
+            return (u + v - 1 + archimedean(family='clayton').get_cdf((1-u),(1-v), param) )
 
         elif self.family == 'gumbel':
             return np.exp(  -( (-np.log(u))**param[0] + (-np.log(v))**param[0] )**(1/param[0]) )
 
         elif self.family == 'rgumbel':
-            return (u + v - 1 + archimedean(family='gumbel').cdf((1-u),(1-v), param) )
+            return (u + v - 1 + archimedean(family='gumbel').get_cdf((1-u),(1-v), param) )
 
         elif self.family == 'frank':
             a = (np.exp(-param[0]*u) -1)*(np.exp(-param[0]*v)-1)
@@ -78,13 +118,13 @@ class archimedean(copula):
             return 1-(u_+v_-u_*v_)**(1/param[0])
 
         elif self.family == 'rjoe':
-            return (u + v - 1 + archimedean(family='joe').cdf((1-u),(1-v), param) )
+            return (u + v - 1 + archimedean(family='joe').get_cdf((1-u),(1-v), param) )
 
         elif self.family == 'galambos':
             return u*v*np.exp(((-np.log(u))**(-param[0])+(-np.log(v))**(-param[0]))**(-1/param[0]) )
 
         elif self.family == 'rgalambos':
-            return (u + v - 1 + archimedean(family='galambos').cdf((1-u),(1-v), param) )
+            return (u + v - 1 + archimedean(family='galambos').get_cdf((1-u),(1-v), param) )
 
         elif self.family == 'fgm':
             return u*v*(1+param[0]*(1-u)*(1-v))
@@ -103,16 +143,23 @@ class archimedean(copula):
             return (1+ (1/param[1])*np.log(u_+v_-1))**(-1/param[0])
         
 
-    def pdf(self, u, v, param):
+    def get_pdf(self, u, v, param):
         """
-            returns the density
+        # Computes the PDF
+
+        Parameters
+        ----------
+        u, v : float
+            Values of the marginal CDFs 
+        param : list
+            A list that contains the copula parameter(s) (float)
         """
 
         if self.family == 'clayton':
             return ((param[0]+1)*(u*v)**(-param[0]-1))*((u**(-param[0])+v**(-param[0])-1)**(-2-1/param[0]))
 
         if self.family == 'rclayton':
-            return archimedean(family='clayton').pdf((1-u),(1-v), param)
+            return archimedean(family='clayton').get_pdf((1-u),(1-v), param)
 
         elif self.family == 'gumbel':
             a = np.power(np.multiply(u, v), -1)
@@ -120,10 +167,10 @@ class archimedean(copula):
             b = np.power(tmp, -2 + 2.0 / param[0])
             c = np.power(np.multiply(np.log(u), np.log(v)), param[0] - 1)
             d = 1 + (param[0] - 1) * np.power(tmp, -1.0 / param[0])
-            return archimedean(family='gumbel').cdf(u,v, param) * a * b * c * d
+            return archimedean(family='gumbel').get_cdf(u,v, param) * a * b * c * d
 
         if self.family == 'rgumbel':
-            return archimedean(family='gumbel').pdf((1-u),(1-v), param)
+            return archimedean(family='gumbel').get_pdf((1-u),(1-v), param)
 
         elif self.family == 'frank':
             a = param[0]*(1-np.exp(-param[0]))*np.exp(-param[0]*(u+v))
@@ -139,16 +186,16 @@ class archimedean(copula):
             return a*b
 
         if self.family == 'rjoe':
-            return archimedean(family='joe').pdf((1-u),(1-v), param)
+            return archimedean(family='joe').get_pdf((1-u),(1-v), param)
 
         elif self.family == 'galambos':
             x = -np.log(u)
             y = -np.log(v)
-            return (self.cdf(u,v, param)/(v*u))*(1-((x**(-param[0]) +y**(-param[0]))**(-1-1/param[0]))*(x**(-param[0]-1) +y**(-param[0]-1))
+            return (self.get_cdf(u,v, param)/(v*u))*(1-((x**(-param[0]) +y**(-param[0]))**(-1-1/param[0]))*(x**(-param[0]-1) +y**(-param[0]-1))
             + ((x**(-param[0]) +y**(-param[0]))**(-2-1/param[0]))*((x*y)**(-param[0]-1))*(1+param[0]+(x**(-param[0]) +y**(-param[0]))**(-1/param[0])))
 
         if self.family == 'rgalambos':
-            return archimedean(family='galambos').pdf((1-u),(1-v), param)
+            return archimedean(family='galambos').get_pdf((1-u),(1-v), param)
 
         elif self.family == 'fgm':
             return 1+param[0]*(1-2*u)*(1-2*v)
@@ -176,7 +223,12 @@ class archimedean(copula):
 
     def LTDC(self, theta):
         """
-            Returns the lower tail dependence coefficient for a given self.theta
+        # Computes the lower TDC for a given theta
+
+        Parameters
+        ----------
+        theta : float
+            The copula parameter
         """
 
         if self.family  in ['gumbel', 'joe', 'frank', 'galambos', 'fgm', 'plackett', 'rclayton']:
@@ -190,7 +242,12 @@ class archimedean(copula):
 
     def UTDC(self, theta):
         """
-            Returns the upper tail dependence coefficient for a given self.theta
+        # Computes the upper TDC for a given theta
+
+        Parameters
+        ----------
+        theta : float
+            The copula parameter
         """
 
         if self.family  in ['clayton', 'frank', 'fgm', 'plackett', 'rgumbel', 'rjoe', 'rgalambos']:
@@ -201,5 +258,3 @@ class archimedean(copula):
 
         elif self.family  in ['gumbel', 'joe'] :
             return 2-2**(1/theta)
-
-
