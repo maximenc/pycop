@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 from scipy import linalg
 from scipy.stats import norm, t, levy_stable, logser

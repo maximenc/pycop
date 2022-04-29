@@ -2,9 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-
-
-
 def empirical_density_contourplot(u, v, lims):
     
     res = 10

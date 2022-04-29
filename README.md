@@ -77,7 +77,7 @@ pip install pycop
 We first create a copula object by specifying the copula familly
 
 ```python
-from pycop.bivariate import archimedean
+from pycop import archimedean
 cop = archimedean(family="clayton")
 ```
 
@@ -159,7 +159,7 @@ cop.plot_mpdf([2], marginals, type="contour", Nsplit=100,  lvls=lvls)
 mixture of 2 copulas
 
 ```python
-from pycop.bivariate.mixture import mixture
+from pycop.mixture import mixture
 
 cop = mixture(["clayton", "gumbel"])
 cop.plot_pdf([0.2, 2, 2],  type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6] )
@@ -336,7 +336,7 @@ df = df.dropna()
 
 
 ```python
-from pycop.bivariate import estimation, archimedean
+from pycop import estimation, archimedean
 
 cop = archimedean.archimedean("clayton")
 param, cmle = estimation.fit_cmle(cop, df[["US","UK"]])
@@ -359,7 +359,7 @@ cop.UTDC(theta=param)
 ## Non-parametric TDC
 Create an empirical copula object 
 ```python
-from pycop.bivariate import empirical
+from pycop import empirical
 
 cop = empirical(df[["US","UK"]])
 ```

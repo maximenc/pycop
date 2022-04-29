@@ -9,3 +9,4 @@ setup.cfg
 tests/
 dist/
 build/
+pycop/simulation.pyc
