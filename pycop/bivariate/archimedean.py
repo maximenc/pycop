@@ -1,5 +1,5 @@
 import numpy as np
-from copula import copula
+from pycop.bivariate.copula import copula
 
 class archimedean(copula):
     """

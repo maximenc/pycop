@@ -1,5 +1,5 @@
 from scipy.stats import norm, multivariate_normal
-from copula import copula
+from pycop.bivariate.copula import copula
 class gaussian(copula):
     """
     # Creates a gaussian copula object

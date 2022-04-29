@@ -1,9 +1,9 @@
 from distutils.log import error
 import numpy as np
-from copula import copula
-from archimedean import archimedean
-from gaussian import gaussian
-from student import student
+from pycop.bivariate.copula import copula
+from pycop.bivariate.archimedean import archimedean
+from pycop.bivariate.gaussian import gaussian
+from pycop.bivariate.student import student
 
 
 class mixture(copula):

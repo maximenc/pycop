@@ -1,8 +1,7 @@
 import numpy as np
 from scipy.stats import t
 from scipy.special import gamma
-
-from copula import copula
+from pycop.bivariate.copula import copula
 class student(copula):
     """
     # Creates a student copula object
