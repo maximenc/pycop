@@ -53,14 +53,15 @@ pip install pycop
 
 # Open Examples in Colaboratory
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_estim.ipynb)
-[Estimations on msci returns](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_estim.ipynb)
+[Estimations on msci returns](https://github.com/maximenc/pycop/blob/master/examples/example_estim.ipynb)
+
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_plot.ipynb)
-[Graphical Representations](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_plot.ipynb)
+[Graphical Representations](https://github.com/maximenc/pycop/blob/master/examples/example_plot.ipynb)
 
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_simu.ipynb)
-[Simulations](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_simu.ipynb)
+[Simulations](https://github.com/maximenc/pycop/blob/master/examples/example_simu.ipynb)
 
 
 
