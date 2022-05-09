@@ -51,7 +51,7 @@ Install pycop using pip
 pip install pycop
 ```
 
-# Open Examples in Colaboratory
+# Examples
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_estim.ipynb)
 [Estimations on msci returns](https://github.com/maximenc/pycop/blob/master/examples/example_estim.ipynb)
 
