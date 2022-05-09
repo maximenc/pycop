@@ -51,6 +51,17 @@ Install pycop using pip
 pip install pycop
 ```
 
+# Open Examples in Colaboratory
+- [Estimations on msci returns](https://github.com/maximenc/pycop/blob/main/pycop/examples/example_estim.ipynb) &ensp;&ensp;&nbsp;
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_estim.ipynb)
+
+- [Graphical Representations](https://github.com/maximenc/pycop/blob/main/pycop/examples/example_plot.ipynb) &ensp;&ensp;&ensp;&ensp;
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_plot.ipynb)
+
+- [Simulations](https://github.com/maximenc/pycop/blob/main/pycop/examples/example_simu.ipynb) &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_simu.ipynb)
+
+
 
 # Table of Contents
 
@@ -96,13 +107,13 @@ cop.plot_pdf([2], type="3d", Nsplit=100, cmap="cividis" )
 
 <p align="center">
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/gumbel_3d_cdf.svg" width="45%" />
-  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/gumbel_3d_pdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/gumbel_3d_pdf.svg" width="45%" />
 </p>
 
 
 ## Contour plot
 
-plot the contour 
+plot the contour
 
 ```python
 cop = archimedean(family="plackett")
@@ -114,7 +125,7 @@ cop.plot_pdf([2], type="contour", Nsplit=100, )
 
 <p align="center">
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/plackett_contour_cdf.svg" width="45%" />
-  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/plackett_contour_pdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/plackett_contour_pdf.svg" width="45%" />
 </p>
 
 
@@ -135,9 +146,9 @@ marginals = [
     }]
 
 cop.plot_mpdf([2], marginals, type="3d",Nsplit=100,
-            rstride=1, cstride=1, 
+            rstride=1, cstride=1,
             antialiased=True,
-            cmap="cividis", 
+            cmap="cividis",
             edgecolor='black',
             linewidth=0.1,
             zorder=1,
@@ -151,7 +162,7 @@ cop.plot_mpdf([2], marginals, type="contour", Nsplit=100,  lvls=lvls)
 
 <p align="center">
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/clayton_3d_mpdf.svg" width="45%" />
-  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/clayton_contour_mpdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/clayton_contour_mpdf.svg" width="45%" />
 </p>
 
 ## Mixture plot
@@ -165,22 +176,22 @@ cop = mixture(["clayton", "gumbel"])
 cop.plot_pdf([0.2, 2, 2],  type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6] )
 # plot with defined marginals
 cop.plot_mpdf([0.2, 2, 2], marginals, type="contour", Nsplit=50)
-``` 
+```
 <p align="center">
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/2c_mixture_contour_pdf.svg" width="45%" />
-  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/2c_mixture_contour_mpdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/2c_mixture_contour_mpdf.svg" width="45%" />
 </p>
 
 
 ```python
- 
+
 cop = mixture(["clayton","gaussian", "gumbel"])
 cop.plot_pdf([1/3, 1/3, 1/3, 2, 0.5, 4],  type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6] )
 cop.plot_mpdf([1/3, 1/3, 1/3, 2, 0.5, 2], marginals, type="contour", Nsplit=50)
 ```
 <p align="center">
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/3c_mixture_contour_pdf.svg" width="45%" />
-  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/3c_mixture_contour_mpdf.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/3c_mixture_contour_mpdf.svg" width="45%" />
 </p>
 
 
@@ -199,7 +210,7 @@ m = 1000 # sample size
 corrMatrix = [[1, 0.8], [0.8, 1]]
 u1, u2 = simulation.simu_gaussian(n, m, corrMatrix)
 ```
-Adding gaussian marginals, (using distribution.ppf from scipy.statsto transform uniform margin to the desired distribution) 
+Adding gaussian marginals, (using distribution.ppf from scipy.statsto transform uniform margin to the desired distribution)
 
 ```python
 u1 = norm.ppf(u1)
@@ -215,7 +226,7 @@ u1, u2 = simulation.simu_tstudent(n, m, corrMatrix, nu=1)
 
 <p align="center">
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/gaussian_simu.svg" width="45%" />
-  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/student_simu.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/student_simu.svg" width="45%" />
 </p>
 
 
@@ -231,7 +242,7 @@ u1, u2 = simulation.simu_archimedean("gumbel", n, m, theta=2)
 u1, u2 = 1 - u1, 1 - u2
 ```
 
-Rotated 
+Rotated
 
 ```python
 u1, u2 = 1 - u1, 1 - u2
@@ -240,11 +251,11 @@ u1, u2 = 1 - u1, 1 - u2
 
 <p align="center">
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/gumbel_simu.svg" width="45%" />
-  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/rgumbel_simu.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/rgumbel_simu.svg" width="45%" />
 </p>
 
 
-## High dimension 
+## High dimension
 
 
 ```python
@@ -267,7 +278,7 @@ u = norm.ppf(u)
 ```
 
 <p align="center">
-  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/clayton_simu_n3.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/clayton_simu_n3.svg" width="45%" />
 </p>
 
 ## Mixture simulation
@@ -306,7 +317,7 @@ u = norm.ppf(u)
 ```
 
 <p align="center">
-  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/3c_mixture_simu.svg" width="45%" /> 
+  <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/3c_mixture_simu.svg" width="45%" />
 </p>
 
 
@@ -357,7 +368,7 @@ cop.UTDC(theta=param)
 
 
 ## Non-parametric TDC
-Create an empirical copula object 
+Create an empirical copula object
 ```python
 from pycop import empirical
 
@@ -373,6 +384,6 @@ cop.UTDC(0.99) # i/n = 99%
 Returns the optimal non-parametric TDC based on the heuristic plateau-finding algorithm from Frahm et al (2005) "Estimating the tail-dependence coefficient: properties and pitfalls"
 
 ```python
-cop.optimal_tdc("upper") 
+cop.optimal_tdc("upper")
 cop.optimal_tdc("lower")
 ```
