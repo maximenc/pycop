@@ -52,14 +52,15 @@ pip install pycop
 ```
 
 # Open Examples in Colaboratory
-- [Estimations on msci returns](https://github.com/maximenc/pycop/blob/main/pycop/examples/example_estim.ipynb) &ensp;&ensp;&nbsp;
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_estim.ipynb)
+[Estimations on msci returns](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_estim.ipynb)
 
-- [Graphical Representations](https://github.com/maximenc/pycop/blob/main/pycop/examples/example_plot.ipynb) &ensp;&ensp;&ensp;&ensp;
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_plot.ipynb)
+[Graphical Representations](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_plot.ipynb)
 
-- [Simulations](https://github.com/maximenc/pycop/blob/main/pycop/examples/example_simu.ipynb) &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
+
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_simu.ipynb)
+[Simulations](https://githubtocolab.com/maximenc/pycop/blob/master/examples/example_simu.ipynb)
 
 
 
