@@ -10,7 +10,7 @@
 
 # Overview
 
-Pycop is the most complete tool for modeling multivariate dependence with Python.The package provides methods such as estimation, random sample generation, and graphical representation for commonly used copula functions. The package supports the use of mixture models defined as convex combinations of copulas. Other methods based on the empirical copula such as the non-parametric Tail Dependence Coefficient are given.
+Pycop is the most complete tool for modeling multivariate dependence with Python. The package provides methods such as estimation, random sample generation, and graphical representation for commonly used copula functions. The package supports the use of mixture models defined as convex combinations of copulas. Other methods based on the empirical copula such as the non-parametric Tail Dependence Coefficient are given.
 
 Some of the features covered:
 * Elliptical copulas (Gaussian & Student) and common Archimedean Copulas functions
