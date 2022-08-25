@@ -156,7 +156,7 @@ def simu_archimedean(family: str, n: int, m: int, theta: float):
         raise ValueError("The family argument must be one of 'clayton', 'gumbel', 'frank', 'joe' or 'amh'.")
     if not all(isinstance(v, int) for v in [n, m]):
         raise TypeError("The 'n' and 'm' arguments must both be integer types.")
-    if not isinstance(theta, float):
+    if not isinstance(theta, (int, float)):
         raise TypeError("The 'theta' argument must be a float type.")
 
     if family == "clayton":
