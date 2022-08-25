@@ -4,8 +4,10 @@ from scipy import linalg
 from scipy.stats import norm, t, levy_stable, logser
 from scipy.special import gamma, comb
 from distutils.log import error
+from typing import List
 
-def simu_gaussian(n, m, corrMatrix):
+
+def simu_gaussian(n: int, m: int, corr_matrix: np.array):
     """ 
     # Gaussian Copula simulations with a given correlation matrix
 
@@ -15,7 +17,7 @@ def simu_gaussian(n, m, corrMatrix):
         the dimension number of simulated variables
     m : int
         the sample size 
-    corrMatrix : array
+    corr_matrix : array
         the correlation matrix
 
     Returns
@@ -24,19 +26,22 @@ def simu_gaussian(n, m, corrMatrix):
         the simulated sample 
 
     """
-
+    if not all(isinstance(v, int) for v in [n, m]):
+        raise TypeError("The 'n' and 'm' arguments must both be integer types.")
+    if not isinstance(corr_matrix, np.ndarray):
+        raise TypeError("The 'corr_matrix' argument must be a numpy array.")
     # Generate n independent standard Gaussian random variables V = (v1 ,..., vn):
-    v = [np.random.normal(0,1,m) for i in range(0,n)]
+    v = [np.random.normal(0, 1, m) for i in range(0, n)]
 
     # Compute the lower triangular Cholesky factorization of the correlation matrix:
-    L = linalg.cholesky(corrMatrix, lower=True)
-    y = np.dot(L, v)
-    u = norm.cdf(y, 0, 1 )
+    l = linalg.cholesky(corr_matrix, lower=True)
+    y = np.dot(l, v)
+    u = norm.cdf(y, 0, 1)
 
     return u
 
 
-def simu_tstudent(n, m, corrMatrix, nu):
+def simu_tstudent(n: int, m: int, corr_matrix: np.array, nu: float):
     """
     # Student Copula with k degrees of freedom and a given correlation matrix
 
@@ -46,7 +51,7 @@ def simu_tstudent(n, m, corrMatrix, nu):
         the dimension number of simulated variables
     m : int
         the sample size 
-    corrMatrix : array
+    corr_matrix : array
         the correlation matrix
     nu : float
         the degree of freedom 
@@ -57,13 +62,19 @@ def simu_tstudent(n, m, corrMatrix, nu):
         the simulated sample 
 
     """
+    if not all(isinstance(v, int) for v in [n, m]):
+        raise TypeError("The 'n' and 'm' arguments must both be integer types.")
+    if not isinstance(corr_matrix, np.ndarray):
+        raise TypeError("The 'corr_matrix' argument must be a numpy array.")
+    if not isinstance(nu, (int, float)):
+        raise TypeError("The 'nu' argument must be a float type.")
 
     # Generate n independent standard Gaussian random variables  V = (v1 ,..., vn):
-    v = [np.random.normal(0,1,m) for i in range(0,n)]
+    v = [np.random.normal(0, 1, m) for i in range(0, n)]
 
     # Compute the lower triangular Cholesky factorization of rho:
-    L = linalg.cholesky(corrMatrix, lower=True)
-    z = np.dot(L, v)
+    l = linalg.cholesky(corr_matrix, lower=True)
+    z = np.dot(l, v)
 
     # generate a random variable r, following a chi2-distribution with nu degrees of freedom
     r = np.random.chisquare(df=nu,size=m)
@@ -74,7 +85,7 @@ def simu_tstudent(n, m, corrMatrix, nu):
     return u
 
 
-def SimuSibuya(alpha, m):
+def SimuSibuya(alpha: float, m: int):
     """
     # Sibuya distribution Sibuya(α)
     Used for sampling F=Sibuya(α) for Joe copula 
@@ -93,13 +104,17 @@ def SimuSibuya(alpha, m):
         the simulated sample 
 
     """
+    if not isinstance(alpha, (int, float)):
+        raise TypeError("The 'alpha' argument must be a float type.")
+    if not isinstance(m, int):
+        raise TypeError("The 'm' argument must be an integer type.")
 
-    G_1 = lambda y: ((1-y)*gamma(1-alpha) )**(-1/alpha)
-    F = lambda n: 1- ((-1)**n)*comb(n,alpha-1)
+    G_1 = lambda y: ((1-y)*gamma(1-alpha))**(-1/alpha)
+    F = lambda n: 1 - ((-1)**n)*comb(n, alpha-1)
 
-    X = np.random.uniform(0,1,m)
+    X = np.random.uniform(0, 1, m)
 
-    for i in range(0,len(X)):
+    for i in range(0, len(X)):
         if X[i] <= alpha:
             X[i] = 1
         elif F(np.floor(G_1(X[i]))) < X[i]:
@@ -110,15 +125,14 @@ def SimuSibuya(alpha, m):
     return X
 
 
-
-def simu_archimedean(familly, n, m, theta):
+def simu_archimedean(family: str, n: int, m: int, theta: float):
     """
     Archimedean copula simulation
 
     Parameters
     ----------
 
-    familly : str
+    family : str
         type of the distribution
     n : int
         the dimension number of simulated variables
@@ -138,60 +152,50 @@ def simu_archimedean(familly, n, m, theta):
         the simulated sample, array matrix with dim (m, n)
 
     """
+    if family not in ["clayton", "gumbel", "frank", "joe", "amh"]:
+        raise ValueError("The family argument must be one of 'clayton', 'gumbel', 'frank', 'joe' or 'amh'.")
+    if not all(isinstance(v, int) for v in [n, m]):
+        raise TypeError("The 'n' and 'm' arguments must both be integer types.")
+    if not isinstance(theta, (int, float)):
+        raise TypeError("The 'theta' argument must be a float type.")
 
-    if familly == "clayton":
+    if family == "clayton":
         # Generate n independent standard uniform random variables  V = (v1 ,..., vn):
-        v = [np.random.uniform(0,1,m) for i in range(0,n)]
+        v = [np.random.uniform(0, 1, m) for i in range(0, n)]
         # generate a random variable x following the gamma distribution gamma(theta**(-1), 1)
-        X = np.array([np.random.gamma(theta**(-1), scale=1.0) for i in range(0,m)])
+        X = np.array([np.random.gamma(theta**(-1), scale=1.0) for i in range(0, m)])
         phi_t = lambda t:  (1+t)**(-1/theta)
-        u = [phi_t(-np.log(v[i])/X) for i in range(0,n)]
+        u = [phi_t(-np.log(v[i])/X) for i in range(0, n)]
 
-    elif familly == "gumbel":
-        v = [np.random.uniform(0,1,m) for i in range(0,n)]
-        X = levy_stable.rvs(alpha=1/theta, beta=1,scale=(np.cos(np.pi/(2*theta)))**theta,loc=0, size=m)
-
+    elif family == "gumbel":
+        v = [np.random.uniform(0, 1, m) for i in range(0, n)]
+        X = levy_stable.rvs(alpha=1/theta, beta=1, scale=(np.cos(np.pi/(2*theta)))**theta, loc=0, size=m)
         phi_t = lambda t:  np.exp(-t**(1/theta))
+        u = [phi_t(-np.log(v[i])/X) for i in range(0, n)]
 
-        u = [phi_t(-np.log(v[i])/X) for i in range(0,n)]
-
-    elif familly == "frank":
-
-        v = [np.random.uniform(0,1,m) for i in range(0,n)]
+    elif family == "frank":
+        v = [np.random.uniform(0, 1, m) for i in range(0, n)]
         p = 1-np.exp(-theta)
         X = logser.rvs(p, loc=0, size=m, random_state=None)
-
-        phi_t = lambda t:  -np.log(1-np.exp(-t)*(1-np.exp(-theta)))/theta
-        u = [phi_t(-np.log(v[i])/X) for i in range(0,n)]
+        phi_t = lambda t: -np.log(1-np.exp(-t)*(1-np.exp(-theta)))/theta
+        u = [phi_t(-np.log(v[i])/X) for i in range(0, n)]
     
-    elif familly == "joe":
-
+    elif family == "joe":
         alpha = 1/theta
         X = SimuSibuya(alpha, m)
-
-        v = [np.random.uniform(0,1,m) for i in range(0,n)]
-
+        v = [np.random.uniform(0, 1, m) for i in range(0, n)]
         phi_t = lambda t: (1-(1-np.exp(-t))**(1/theta))
+        u = [phi_t(-np.log(v[i])/X) for i in range(0, n)]
 
-        u = [phi_t(-np.log(v[i])/X) for i in range(0,n)]
-
-
-    elif familly == "amh":
-
-        v = [np.random.uniform(0,1,m) for i in range(0,n)]
-
+    elif family == "amh":
+        v = [np.random.uniform(0, 1, m) for i in range(0, n)]
         X = np.random.geometric(p=1-theta, size=m)
-
         phi_t = lambda t:  (1-theta)/(np.exp(t)-theta)
-
-        u = [phi_t(-np.log(v[i])/X) for i in range(0,n)]
-
-    else:
-        raise error
-
+        u = [phi_t(-np.log(v[i])/X) for i in range(0, n)]
     return u
 
-def simu_mixture(n, m, combination):
+
+def simu_mixture(n: int, m: int, combination: List[dict]):
     """
     Mixture copula simulation
 
@@ -206,7 +210,7 @@ def simu_mixture(n, m, combination):
     combination : list
         A list of dictionaries that contains information on the copula to combine.
 
-        exemple:
+        example:
         combination =[
             {
                 "type": "clayton",
@@ -227,34 +231,37 @@ def simu_mixture(n, m, combination):
         the simulated sample, array matrix with dim (m, n)
 
     """
-    
+    if not all(isinstance(v, int) for v in [n, m]):
+        raise TypeError("The 'n' and 'm' arguments must both be integer types.")
+    if not isinstance(combination, list):
+        raise TypeError("The 'combination' argument must be a list type")
+    if not all(isinstance(v, dict) for v in combination):
+        raise TypeError("Each element of the 'combination' argument must be a dict type.")
 
-    v = [np.random.uniform(0,1,m) for i in range(0,n)]
-
+    v = [np.random.uniform(0, 1, m) for i in range(0, n)]
     weights = [comb["weight"] for comb in combination]
-
     #Generate a random sample of indexes of combination types 
-    y = np.array([np.where(ls==1)[0][0] for ls in np.random.multinomial(n=1, pvals=weights, size=m)])
+    y = np.array([np.where(ls == 1)[0][0] for ls in np.random.multinomial(n=1, pvals=weights, size=m)])
 
-    for i in range(0,len(combination)):
-        combinationsize = len(v[0][y==i])
+    for i in range(0, len(combination)):
+        combinationsize = len(v[0][y == i])
 
         if combination[i]["type"] == "gaussian":
-            corrMatrix = combination[i]["corrMatrix"]
+            corr_matrix = combination[i]["corrMatrix"]
 
-            vi = simu_gaussian(n, combinationsize, corrMatrix)
-            for j in range(0,len(vi)):
-                    v[j][y==i] = vi[j]
+            vi = simu_gaussian(n, combinationsize, corr_matrix)
+            for j in range(0, len(vi)):
+                    v[j][y == i] = vi[j]
         elif combination[i]["type"] == "student":
-            corrMatrix = combination[i]["corrMatrix"]
+            corr_matrix = combination[i]["corrMatrix"]
             nu = combination[i]["nu"]
-            vi = simu_tstudent(n, combinationsize, corrMatrix, nu)
+            vi = simu_tstudent(n, combinationsize, corr_matrix, nu)
 
         elif combination[i]["type"] in ["clayton", "gumbel", "frank", "joe", "amh"]:
             vi = simu_archimedean(combination[i]["type"], n, combinationsize, combination[i]["theta"])
 
-            for j in range(0,len(vi)):
-                    v[j][y==i] = vi[j]
+            for j in range(0, len(vi)):
+                    v[j][y == i] = vi[j]
         else:
             raise error
 
