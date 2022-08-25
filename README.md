@@ -209,7 +209,7 @@ from pycop import simulation
 n = 2 # dimension
 m = 1000 # sample size
 
-corrMatrix = [[1, 0.8], [0.8, 1]]
+corrMatrix = np.array([[1, 0.8], [0.8, 1]])
 u1, u2 = simulation.simu_gaussian(n, m, corrMatrix)
 ```
 Adding gaussian marginals, (using distribution.ppf from scipy.statsto transform uniform margin to the desired distribution)
@@ -265,7 +265,7 @@ u1, u2 = 1 - u1, 1 - u2
 n = 3       # Dimension
 m = 1000    # Sample size
 
-corrMatrix = [[1, 0.9, 0], [0.9, 1, 0], [0, 0, 1]]
+corrMatrix = np.array([[1, 0.9, 0], [0.9, 1, 0], [0, 0, 1]])
 u = simulation.simu_gaussian(n, m, corrMatrix)
 u = norm.ppf(u)
 ```
@@ -305,7 +305,7 @@ u = norm.ppf(u)
 
 Simulation from a mixture of 3 copulas
 ```python
-corrMatrix = [[1, 0.8, 0], [0.8, 1, 0], [0, 0, 1]]
+corrMatrix = np.array([[1, 0.8, 0], [0.8, 1, 0], [0, 0, 1]])
 
 
 combination = [
