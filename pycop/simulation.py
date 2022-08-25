@@ -104,7 +104,7 @@ def SimuSibuya(alpha: float, m: int):
         the simulated sample 
 
     """
-    if not isinstance(alpha, float):
+    if not isinstance(alpha, (int, float)):
         raise TypeError("The 'alpha' argument must be a float type.")
     if not isinstance(m, int):
         raise TypeError("The 'm' argument must be an integer type.")
