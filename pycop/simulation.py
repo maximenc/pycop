@@ -64,7 +64,7 @@ def simu_tstudent(n: int, m: int, corr_matrix: np.array, nu: float):
     """
     if not all(isinstance(v, int) for v in [n, m]):
         raise TypeError("The 'n' and 'm' arguments must both be integer types.")
-    if not isinstance(corr_matrix, np.array):
+    if not isinstance(corr_matrix, np.ndarray):
         raise TypeError("The 'corr_matrix' argument must be a numpy array.")
     if not isinstance(nu, float):
         raise TypeError("The 'nu' argument must be a float type.")
