@@ -66,7 +66,7 @@ def simu_tstudent(n: int, m: int, corr_matrix: np.array, nu: float):
         raise TypeError("The 'n' and 'm' arguments must both be integer types.")
     if not isinstance(corr_matrix, np.ndarray):
         raise TypeError("The 'corr_matrix' argument must be a numpy array.")
-    if not isinstance(nu, float):
+    if not isinstance(nu, (int, float)):
         raise TypeError("The 'nu' argument must be a float type.")
 
     # Generate n independent standard Gaussian random variables  V = (v1 ,..., vn):
