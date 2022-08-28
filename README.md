@@ -6,7 +6,7 @@
 [![PyPi version](https://badgen.net/pypi/v/pycop/)](https://pypi.org/project/pycop)
 [![Downloads](https://pepy.tech/badge/pycop)](https://pepy.tech/project/pycop)
 [![License](https://img.shields.io/pypi/l/pycop)](https://img.shields.io/pypi/l/pycop)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7030034.svg)](https://doi.org/10.5281/zenodo.7030034)
 
 # Overview
 
