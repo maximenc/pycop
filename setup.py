@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'pycop',
-    version = '0.0.9',  
+    version = '0.0.10',  
     description = 'Copula for multivariate dependence modeling',
     long_description=open('README.md', 'r').read(),
     long_description_content_type="text/markdown",
