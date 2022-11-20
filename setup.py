@@ -12,4 +12,5 @@ setup(
     url = 'https://github.com/maximenc/pycop/',
     download_url = 'https://github.com/maximenc/pycop/',
     classifiers = [],
+    include_package_data=True
 )
