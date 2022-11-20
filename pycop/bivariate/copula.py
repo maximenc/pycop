@@ -66,18 +66,18 @@ class copula():
 
     Methods
     -------
-    plot_cdf(param, type,  Nsplit=50, **kwargs)
+    plot_cdf(param, plot_type,  Nsplit=50, **kwargs)
         Plot the bivariate Cumulative Distribution Function (CDF)
-    plot_pdf(param, type,  Nsplit=50, **kwargs)
+    plot_pdf(param, plot_type,  Nsplit=50, **kwargs)
         Plot the Probability Density Function (PDF)
-    plot_mpdf(param, margin, type,  Nsplit=50, **kwargs)
+    plot_mpdf(param, margin, plot_type,  Nsplit=50, **kwargs)
         Plot the PDF with given marginal distributions
     """
     
     def __init__(self):
         pass
 
-    def plot_cdf(self, param, type,  Nsplit=50, **kwargs):
+    def plot_cdf(self, param, plot_type, Nsplit=50, **kwargs):
         """
         # Plot the bivariate CDF
 
@@ -85,7 +85,7 @@ class copula():
         ----------
         param : list
             A list of the copula parameter(s)
-        type : str
+        plot_type : str
             The type of the plot either "3d" or "contour"
         Nsplit : int, optional
             The number of points plotted (Nsplit*Nsplit) (default is 50)
@@ -111,15 +111,15 @@ class copula():
         
         Z = Z.reshape(U_grid.shape)
 
-        if type == "3d":
+        if plot_type == "3d":
             plot_bivariate_3d(U_grid,V_grid,Z, [0,1], title, **kwargs)
-        elif type == "contour":
+        elif plot_type == "contour":
             plot_bivariate_contour(U_grid,V_grid,Z, [0,1], title, **kwargs)
         else:
             print("only \"contour\" or \"3d\" arguments supported for type")
             raise ValueError
 
-    def plot_pdf(self, param, type,  Nsplit=50, **kwargs):
+    def plot_pdf(self, param, plot_type, Nsplit=50, **kwargs):
         """
         # Plot the bivariate PDF
 
@@ -127,7 +127,7 @@ class copula():
         ----------
         param : list
             A list of the copula parameter(s)
-        type : str
+        plot_type : str
             The type of the plot either "3d" or "contour"
         Nsplit : int, optional
             The number of points plotted (Nsplit*Nsplit) (default is 50)
@@ -143,10 +143,10 @@ class copula():
 
         title = self.family.capitalize() + " Copula PDF" 
 
-        if type == "3d":
+        if plot_type == "3d":
             bounds = [0+1e-1/2, 1-1e-1/2]
 
-        elif type == "contour":
+        elif plot_type == "contour":
             bounds = [0+1e-2, 1-1e-2]
 
         U_grid, V_grid = np.meshgrid(
@@ -158,17 +158,17 @@ class copula():
        
         Z = Z.reshape(U_grid.shape)
 
-        if type == "3d":
+        if plot_type == "3d":
 
             plot_bivariate_3d(U_grid,V_grid,Z, [0,1], title, **kwargs)
-        elif type == "contour":
+        elif plot_type == "contour":
             plot_bivariate_contour(U_grid,V_grid,Z, [0,1], title, **kwargs)
         else:
             print("only \"contour\" or \"3d\" arguments supported for type")
             raise ValueError
 
 
-    def plot_mpdf(self, param, margin, type,  Nsplit=50, **kwargs):
+    def plot_mpdf(self, param, margin, plot_type, Nsplit=50, **kwargs):
         """
         # Plot the bivariate PDF with given marginal distributions.
         
@@ -191,7 +191,7 @@ class copula():
                 {
                     "distribution": norm, "loc" : 0, "scale": 1,
                 }]
-        - type : str
+        - plot_type : str
             The type of the plot either "3d" or "contour"
         - Nsplit : int, optional
             The number of points plotted (Nsplit*Nsplit) (default is 50)
@@ -228,9 +228,9 @@ class copula():
             [mpdf(uu, vv) for uu, vv in zip(np.ravel(U_grid), np.ravel(V_grid)) ] )
         Z = Z.reshape(U_grid.shape)
 
-        if type == "3d":
+        if plot_type == "3d":
             plot_bivariate_3d(U_grid,V_grid,Z, bounds, title, **kwargs)
-        elif type == "contour":
+        elif plot_type == "contour":
             plot_bivariate_contour(U_grid,V_grid,Z, bounds, title, **kwargs)
         else:
             print("only \"contour\" or \"3d\" arguments supported for type")

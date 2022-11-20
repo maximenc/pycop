@@ -4,9 +4,8 @@ pycop/multivariate/__pycache__/
 pycop/__pycache__/
 pycop.egg-info
 build/lib/pycop
-pyproject.toml
 setup.cfg
-tests/
 dist/
+tests/
 build/
 pycop/simulation.pyc

@@ -102,8 +102,8 @@ Plot the cdf and pdf of the copula.
 ```python
 cop = archimedean(family="gumbel")
 
-cop.plot_cdf([2], type="3d", Nsplit=100 )
-cop.plot_pdf([2], type="3d", Nsplit=100, cmap="cividis" )
+cop.plot_cdf([2], plot_type="3d", Nsplit=100 )
+cop.plot_pdf([2], plot_type="3d", Nsplit=100, cmap="cividis" )
 ```
 
 
@@ -120,8 +120,8 @@ plot the contour
 ```python
 cop = archimedean(family="plackett")
 
-cop.plot_cdf([2], type="contour", Nsplit=100 )
-cop.plot_pdf([2], type="contour", Nsplit=100, )
+cop.plot_cdf([2], plot_type="contour", Nsplit=100 )
+cop.plot_pdf([2], plot_type="contour", Nsplit=100, )
 ```
 
 
@@ -147,7 +147,7 @@ marginals = [
         "distribution": norm, "loc" : 0, "scale": 0.6,
     }]
 
-cop.plot_mpdf([2], marginals, type="3d",Nsplit=100,
+cop.plot_mpdf([2], marginals, plot_type="3d",Nsplit=100,
             rstride=1, cstride=1,
             antialiased=True,
             cmap="cividis",
@@ -158,7 +158,7 @@ cop.plot_mpdf([2], marginals, type="3d",Nsplit=100,
 
 lvls = [0.02, 0.05, 0.1, 0.2, 0.3]
 
-cop.plot_mpdf([2], marginals, type="contour", Nsplit=100,  lvls=lvls)
+cop.plot_mpdf([2], marginals, plot_type="contour", Nsplit=100,  lvls=lvls)
 ```
 
 
@@ -175,9 +175,9 @@ mixture of 2 copulas
 from pycop.mixture import mixture
 
 cop = mixture(["clayton", "gumbel"])
-cop.plot_pdf([0.2, 2, 2],  type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6] )
+cop.plot_pdf([0.2, 2, 2],  plot_type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6] )
 # plot with defined marginals
-cop.plot_mpdf([0.2, 2, 2], marginals, type="contour", Nsplit=50)
+cop.plot_mpdf([0.2, 2, 2], marginals, plot_type="contour", Nsplit=50)
 ```
 <p align="center">
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/2c_mixture_contour_pdf.svg" width="45%" />
@@ -188,8 +188,8 @@ cop.plot_mpdf([0.2, 2, 2], marginals, type="contour", Nsplit=50)
 ```python
 
 cop = mixture(["clayton","gaussian", "gumbel"])
-cop.plot_pdf([1/3, 1/3, 1/3, 2, 0.5, 4],  type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6] )
-cop.plot_mpdf([1/3, 1/3, 1/3, 2, 0.5, 2], marginals, type="contour", Nsplit=50)
+cop.plot_pdf([1/3, 1/3, 1/3, 2, 0.5, 4],  plot_type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6] )
+cop.plot_mpdf([1/3, 1/3, 1/3, 2, 0.5, 2], marginals, plot_type="contour", Nsplit=50)
 ```
 <p align="center">
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/plot/3c_mixture_contour_pdf.svg" width="45%" />
