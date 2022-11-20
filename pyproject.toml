@@ -1,3 +1,23 @@
+[project]
+name = "pycop"
+version = "0.0.8"
+description = "Copula for multivariate dependence modeling"
+authors = [
+    { name = "Maxime N", email = "maxime.nlc@proton.me" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/maximenc/pycop/"
+"Bug Tracker" = "https://github.com/maximenc/pycop/issues"
+
 [build-system]
-requires = ["pdm-pep517"]
-build-backend = "pdm.pep517.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
