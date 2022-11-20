@@ -1,4 +1,4 @@
-from distutils.core import setup
+from distutils.core import setup, find_packages
 
 setup(
     name = 'pycop',
@@ -12,5 +12,6 @@ setup(
     url = 'https://github.com/maximenc/pycop/',
     download_url = 'https://github.com/maximenc/pycop/',
     classifiers = [],
-    include_package_data=True
+    include_package_data=True,
+    packages=find_packages(".")
 )
