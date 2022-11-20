@@ -2,7 +2,6 @@ from distutils.core import setup, find_packages
 
 setup(
     name = 'pycop',
-    packages = ['pycop'],
     version = '0.0.10',  
     description = 'Copula for multivariate dependence modeling',
     long_description=open('README.md', 'r').read(),
