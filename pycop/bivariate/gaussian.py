@@ -3,7 +3,6 @@ from scipy.stats import norm, multivariate_normal
 from scipy.special import erfinv
 from pycop.bivariate.copula import copula
 
-
 class gaussian(copula):
     """
     # Creates a gaussian copula object
@@ -14,6 +13,12 @@ class gaussian(copula):
     ----------
     family : str
         = "gaussian"
+    bounds_param : list
+        A list that contains the domain of the parameter(s) in a tuple.
+        Exemple : [(lower, upper)]
+    parameters_start : array 
+        Value(s) of the initial guess when estimating the copula parameter(s).
+        It represents the parameter `x0` in the `scipy.optimize.minimize` function.
 
     Methods
     -------
@@ -27,8 +32,6 @@ class gaussian(copula):
         # the `gaussian` copula class inherit the `copula` class
         super().__init__()
         self.family = "gaussian"
-        
-        # My addition
         self.bounds_param = [(-1, 1)]
         self.parameters_start = np.array(0) 
 
@@ -49,7 +52,7 @@ class gaussian(copula):
         y2 = norm.ppf(v, 0, 1)
         rho = param[0]
 
-        return multivariate_normal.cdf((y1,y2), mean=None, cov=[[1,rho],[rho,1]])
+        return multivariate_normal.cdf((y1,y2), mean=None, cov=[[1, rho], [rho, 1]])
 
     def get_pdf(self, u, v, param):
         """
@@ -65,10 +68,10 @@ class gaussian(copula):
         """
         
         rho = param[0]
-        a = np.sqrt(2)*erfinv(2*u-1)
-        b = np.sqrt(2)*erfinv(2*v-1)
+        a = np.sqrt(2) * erfinv(2 * u - 1)
+        b = np.sqrt(2) * erfinv(2 * v - 1)
+        det_rho = 1 - rho**2
         
-        
-        return (1/np.sqrt(1-rho**2))*np.exp(-((a**2 + b**2)*rho**2 -2*a*b*rho)/(2*(1-rho**2)))
+        return det_rho**-0.5 * np.exp(-((a**2 + b**2) * rho**2 -2 * a * b * rho) / (2 * det_rho))
 
 

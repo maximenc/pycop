@@ -4,6 +4,9 @@ from pycop.bivariate.copula import copula
 class archimedean(copula):
     """
     # Creates an Archimedean copula objects
+    Source for the CDF and PDF functions:
+    Joe, H. (2014). Dependence modeling with copulas. CRC press.
+    Chapter 4: Parametric copula families and properties (p.159)
 
     ...
 
@@ -56,7 +59,7 @@ class archimedean(copula):
         self.type = "archimedean"
 
         if family  in ['clayton', 'galambos', 'plackett', 'rclayton', 'rgalambos'] :
-            self.bounds_param = [(0+ 1e-6, None)]
+            self.bounds_param = [(1e-6, None)]
             self.parameters_start = np.array(0.5)
 
         elif family in ['gumbel', 'joe', 'rgumbel', 'rjoe'] :
@@ -72,14 +75,12 @@ class archimedean(copula):
             self.parameters_start = np.array(0)
 
         elif family  in ['BB1'] :
-            self.bounds_param1 = [(1, None)]
-            self.bounds_param2 = [(0, None)]
-            self.parameters_start = (np.array(1.5), np.array(0.5))
+            self.bounds_param = [(1e-6, None), (1, None)]
+            self.parameters_start = (np.array(.5), np.array(1.5))
 
         elif family  in ['BB2'] :
-            self.bounds_param1 = [(0, None)]
-            self.bounds_param2 = [(0, None)]
-            self.parameters_start = (np.array(0.5), np.array(0.5))
+            self.bounds_param = [(1e-6, None), (1e-6, None)]
+            self.parameters_start = (np.array(1), np.array(1))
         else:
             print("family \"%s\" not in list: %s" % (family, archimedean.Archimedean_families) )
             raise ValueError
@@ -97,50 +98,56 @@ class archimedean(copula):
         """
 
         if self.family == 'clayton':
-            return (u**(-param[0])+v**(-param[0])-1)**(-1/param[0])
+            return (u ** (-param[0]) + v ** (-param[0]) - 1) ** (-1 / param[0])
 
         elif self.family == 'rclayton':
-            return (u + v - 1 + archimedean(family='clayton').get_cdf((1-u),(1-v), param) )
+            return (u + v - 1 + archimedean(family='clayton').get_cdf((1 - u),(1 - v), param) )
 
         elif self.family == 'gumbel':
-            return np.exp(  -( (-np.log(u))**param[0] + (-np.log(v))**param[0] )**(1/param[0]) )
+            return np.exp(-((-np.log(u)) ** param[0] + (-np.log(v)) ** param[0] ) ** (1 / param[0]))
 
         elif self.family == 'rgumbel':
             return (u + v - 1 + archimedean(family='gumbel').get_cdf((1-u),(1-v), param) )
 
         elif self.family == 'frank':
-            a = (np.exp(-param[0]*u) -1)*(np.exp(-param[0]*v)-1)
-            return (-1/param[0])*np.log(1+a/(np.exp(-param[0])-1))
+            a = (np.exp(-param[0] * u) - 1) * (np.exp(-param[0] * v) - 1)
+            return (-1 / param[0]) * np.log(1 + a / (np.exp(-param[0]) - 1))
 
         elif self.family == 'joe':
-            u_ = (1 - u)**param[0]
-            v_ = (1 - v)**param[0]
-            return 1-(u_+v_-u_*v_)**(1/param[0])
+            u_ = (1 - u) ** param[0]
+            v_ = (1 - v) ** param[0]
+            return 1 - (u_ + v_ - u_ * v_) ** (1 / param[0])
 
         elif self.family == 'rjoe':
-            return (u + v - 1 + archimedean(family='joe').get_cdf((1-u),(1-v), param) )
+            return (u + v - 1 + archimedean(family='joe').get_cdf((1 - u),(1 - v), param) )
 
         elif self.family == 'galambos':
-            return u*v*np.exp(((-np.log(u))**(-param[0])+(-np.log(v))**(-param[0]))**(-1/param[0]) )
+            return u * v * np.exp(((-np.log(u)) ** (-param[0]) + (-np.log(v)) ** (-param[0])) ** (-1 / param[0]) )
 
         elif self.family == 'rgalambos':
-            return (u + v - 1 + archimedean(family='galambos').get_cdf((1-u),(1-v), param) )
+            return (u + v - 1 + archimedean(family='galambos').get_cdf((1 - u),(1 - v), param) )
 
         elif self.family == 'fgm':
-            return u*v*(1+param[0]*(1-u)*(1-v))
+            return u * v * (1 + param[0] * (1 - u) * (1 - v))
 
         elif self.family == 'plackett':
-            eta = param[0]-1
-            return 0.5*eta**(-1) * (1+eta*(u+v)-( (1+eta*(u+v) )**2 -4*param[0]*eta*u*v)**0.5 )
+            eta = param[0] - 1
+            term1 = 0.5 * eta ** -1
+            term2 = 1 + eta * (u + v)
+            term3 = (1 + eta * (u + v)) ** 2
+            term4 = 4 * param[0] * eta * u * v
+            return term1 * (term2 - (term3 - term4) ** 0.5)
 
         elif self.family == 'BB1':
-            return (1+( (u**(-param[0]) -1)**param[1] +  (v**(-param[0]) -1)**param[1] )**(1/param[1]) )**(-1/param[0])
+            term1 = (u ** (-param[1]) - 1) ** param[0]
+            term2 = (v ** (-param[1]) - 1) ** param[0]
+            term3 = (1 + term1 + term2) ** (1 / param[0])
+            return (term3) ** (-1 / param[1])
 
         elif self.family == 'BB2':
-            u_ = np.exp(param[1]*(u**(-param[0])-1))
-            v_ = np.exp(param[1]*(v**(-param[0])-1))
-
-            return (1+ (1/param[1])*np.log(u_+v_-1))**(-1/param[0])
+            u_ = np.exp(param[0] * (u ** (-param[1]) - 1))
+            v_ = np.exp(param[0] * (v ** (-param[1]) - 1))
+            return (1 + (1 / param[0]) * np.log(u_ + v_ - 1)) ** (-1 / param[1])
         
 
     def get_pdf(self, u, v, param):
@@ -156,70 +163,84 @@ class archimedean(copula):
         """
 
         if self.family == 'clayton':
-            return ((param[0]+1)*(u*v)**(-param[0]-1))*((u**(-param[0])+v**(-param[0])-1)**(-2-1/param[0]))
-
+            term1 = (param[0] + 1) * (u * v) ** (-param[0] - 1)
+            term2 = (u ** (-param[0]) + v ** (-param[0]) - 1) ** (-2 - 1 / param[0])
+            return term1 * term2
+    
         if self.family == 'rclayton':
-            return archimedean(family='clayton').get_pdf((1-u),(1-v), param)
+            return archimedean(family='clayton').get_pdf((1 - u),(1 - v), param)
 
         elif self.family == 'gumbel':
-            a = np.power(np.multiply(u, v), -1)
+            term1 = np.power(np.multiply(u, v), -1)
             tmp = np.power(-np.log(u), param[0]) + np.power(-np.log(v), param[0])
-            b = np.power(tmp, -2 + 2.0 / param[0])
-            c = np.power(np.multiply(np.log(u), np.log(v)), param[0] - 1)
-            d = 1 + (param[0] - 1) * np.power(tmp, -1.0 / param[0])
-            return archimedean(family='gumbel').get_cdf(u,v, param) * a * b * c * d
+            term2 = np.power(tmp, -2 + 2.0 / param[0])
+            term3 = np.power(np.multiply(np.log(u), np.log(v)), param[0] - 1)
+            term4 = 1 + (param[0] - 1) * np.power(tmp, -1 / param[0])
+            return archimedean(family='gumbel').get_cdf(u,v, param) * term1 * term2 * term3 * term4
 
         if self.family == 'rgumbel':
-            return archimedean(family='gumbel').get_pdf((1-u),(1-v), param)
+            return archimedean(family='gumbel').get_pdf((1 - u), (1 - v), param)
 
         elif self.family == 'frank':
-            a = param[0]*(1-np.exp(-param[0]))*np.exp(-param[0]*(u+v))
-            b = (1-np.exp(-param[0])-(1-np.exp(-param[0]*u))*(1-np.exp(-param[0]*v)))**2
-            return a/b
+            term1 = param[0] * (1 - np.exp(-param[0])) * np.exp(-param[0] * (u + v))
+            term2 = (1 - np.exp(-param[0]) - (1 - np.exp(-param[0] * u)) \
+                    * (1 - np.exp(-param[0] * v))) ** 2
+            return term1 / term2
 
         elif self.family == 'joe':
-            u_ = (1 - u)**param[0]
-            v_ = (1 - v)**param[0]
-            a = (u_+v_-u_*v_)**(-2+1/param[0])
-            b = ((1-u)**(param[0]-1))*((1-v)**(param[0]-1))
-            c = param[0]-1+u_+v_+u_*v_
-            return a*b
+            u_ = (1 - u) ** param[0]
+            v_ = (1 - v) ** param[0]
+            term1 = (u_ + v_ - u_ * v_) ** (-2 + 1 / param[0])
+            term2 = ((1 - u) ** (param[0] - 1)) * ((1 - v) ** (param[0] - 1))
+            term3 = param[0] - 1 + u_ + v_ + u_ * v_
+            return term1 * term2 * term3
 
         if self.family == 'rjoe':
-            return archimedean(family='joe').get_pdf((1-u),(1-v), param)
+            return archimedean(family='joe').get_pdf((1 - u),(1 - v), param)
 
         elif self.family == 'galambos':
             x = -np.log(u)
             y = -np.log(v)
-            return (self.get_cdf(u,v, param)/(v*u))*(1-((x**(-param[0]) +y**(-param[0]))**(-1-1/param[0]))*(x**(-param[0]-1) +y**(-param[0]-1))
-            + ((x**(-param[0]) +y**(-param[0]))**(-2-1/param[0]))*((x*y)**(-param[0]-1))*(1+param[0]+(x**(-param[0]) +y**(-param[0]))**(-1/param[0])))
+            term1 = self.get_cdf(u, v, param) / (v * u)
+            term2 = 1 - ((x ** (-param[0]) + y ** (-param[0])) ** (-1 - 1 / param[0])) \
+                    * (x ** (-param[0] - 1) + y ** (-param[0] - 1))
+            term3 = ((x ** (-param[0]) + y ** (-param[0])) ** (-2 - 1 / param[0])) \
+                    * ((x * y) ** (-param[0] - 1))
+            term4 = 1 + param[0] + ((x ** (-param[0]) + y ** (-param[0])) ** (-1 / param[0]))
+            return term1 * term2 + term3 * term4
 
         if self.family == 'rgalambos':
-            return archimedean(family='galambos').get_pdf((1-u),(1-v), param)
+            return archimedean(family='galambos').get_pdf((1 - u),(1 - v), param)
 
         elif self.family == 'fgm':
-            return 1+param[0]*(1-2*u)*(1-2*v)
+            return 1 + param[0] * (1 - 2 * u) * (1 - 2 * v)
 
         elif self.family == 'plackett':
-            eta = (param[0]-1)
-            a = param[0]*(1+eta*(u+v-2*u*v))
-            b = ((1+eta*(u+v))**2-4*param[0]*eta*u*v)**(3/2)
-            return a/b
+            eta = (param[0] - 1)
+            term1 = param[0] * (1 + eta * (u + v - 2 * u * v))
+            term2 = (1 + eta * (u + v)) ** 2 
+            term3 = 4 * param[0] * eta * u * v
+            return term1 / (term2 - term3) ** (3 / 2)
 
         elif self.family == 'BB1':
-            x = (u**(-param[0])-1)**(param[1])
-            y = (v**(-param[0])-1)**(param[1])
-            return ((1+(x+y)**(1/param[1]))**(-1/param[0]-2))*((x+y)**(1/param[1]-2))*(param[0]*(param[1]-1)+(param[0]*param[1]+1)*(x+y)**(1/param[1]))*((x*y)**(1-(1/param[1])))*((u*v)**(-param[0]-1))
+            theta, delta = param[0], param[1]
+            x = (u ** (-theta) - 1) ** (delta)
+            y = (v ** (-theta) - 1) ** (delta)
+            term1 = (1 + (x + y) ** (1 / delta)) ** (-1 / theta - 2)
+            term2 = (x + y) ** (1 / delta - 2)
+            term3 = theta * (delta - 1) + (theta * delta + 1) * (x + y) ** (1 / delta)
+            term4 = (x * y) ** (1 - 1 / delta) * (u * v) ** (-theta - 1)
+            return term1 * term2 * term3 * term4
 
         elif self.family == 'BB2':
-            x = np.exp(param[1]*(u**(-param[0])-1))
-            y = np.exp(param[1]*(v**(-param[0])-1))
-
-            A = (1+(param[1]**-1)*np.log(x + y - 1))**(-1/(param[0]-2))
-            B = (x + y - 1)**(-2)
-            C= (1 + param[0] + param[0]*param[1] + param[0]*np.log(x+y-1))
-            D = (x)*(y)*((u*v)**(-param[0]-1))
-            return np.dot(A*B*C,D)
+            theta, delta = param[0], param[1]
+            x = np.exp(delta * (u ** (-theta) )) - 1
+            y = np.exp(delta * (v ** (-theta) )) - 1
+            term1 = (1 + (delta ** (-1)) * np.log(x + y - 1)) ** (-2 -1 / theta)
+            term2 = (x + y - 1) ** (-2)
+            term3 = 1 + theta + theta * delta + theta * np.log(x + y - 1)
+            term4 = x * y * (u * v) ** (-theta - 1)
+            return term1 * term2 * term3 * term4
 
     def LTDC(self, theta):
         """
@@ -235,10 +256,10 @@ class archimedean(copula):
             return 0
 
         elif self.family  in ['rgalambos', 'clayton'] :
-            return 2**(-1/theta)
+            return 2 ** (-1 / theta)
 
         elif self.family  in ['rgumbel', 'rjoe'] :
-            return 2-2**(1/theta)
+            return 2 - 2 ** (1 / theta)
 
     def UTDC(self, theta):
         """
@@ -254,7 +275,7 @@ class archimedean(copula):
             return 0
 
         elif self.family  in ['galambos', 'rclayton'] :
-            return 2**(-1/theta)
+            return 2 ** (-1 / theta)
 
         elif self.family  in ['gumbel', 'joe'] :
-            return 2-2**(1/theta)
+            return 2 - 2 ** (1 / theta)

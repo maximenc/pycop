@@ -32,12 +32,12 @@ def pseudo_obs(data):
     n = len(data[0])
 
     scaled_ranks = np.array(
-        [[n*l/(n+1) for l in ecdf1(data[0])], [n*l/(n+1) for l in ecdf2(data[1])]])
+        [[n * l / (n + 1) for l in ecdf1(data[0])], [n * l / (n + 1) for l in ecdf2(data[1])]])
 
     return scaled_ranks
 
 
-def fit_cmle(copula, data, opti_method='SLSQP'):
+def fit_cmle(copula, data, opti_method='SLSQP', options={}):
     """
     # Compute the Canonical Maximum likelihood Estimator (CMLE) using the pseudo-observations
 
@@ -51,34 +51,44 @@ def fit_cmle(copula, data, opti_method='SLSQP'):
     opti_method : str, optional
         The optimization method to pass to known_parametersscipy.optimize.minimize`.
         The default algorithm is set to `SLSQP`
+    options : dict, optional
+        The dictionary that contains the options to pass to the scipy.minimize function
+        options={'maxiter': 100000}
 
     Returns
     -------
     Return  the estimated parameter(s) in a list
 
     """
-    
+
     psd_obs = pseudo_obs(data)
 
     def log_likelihood(parameters):
-        params = [parameters]
-        logl = -sum([ np.log(copula.get_pdf(psd_obs[0][i],psd_obs[1][i],params)) for i in range(0,len(psd_obs[0]))])
+        """
+        The number of parameters depends on the type of copule function
+        """
+        if len(copula.bounds_param) == 1:
+            params = [parameters]
+        else:
+            param1, param2 = parameters
+            params = [param1, param2]
+        logl = -np.sum(np.log(copula.get_pdf(psd_obs[0], psd_obs[1], params)))
         return logl
 
-
-    if copula.bounds_param[0] == (None):
-        results = minimize(log_likelihood, copula.parameters_start, method='Nelder-Mead')
-        print("method = Nelder-Mead - termination = ", results.success, " - message: ", results.message)
+    if (copula.bounds_param[0] == (None, None)):
+        results = minimize(log_likelihood, copula.parameters_start, method='Nelder-Mead', options=options)
+        # print("method: Nelder-Mead - success:", results.success, ":", results.message)
         return (results.x, -results.fun)
-    else:
 
-        results = minimize(log_likelihood, copula.parameters_start, method=opti_method, bounds=copula.bounds_param) #options={'maxiter': 300})#.x[0]
-        print("method = ", opti_method, " - termination = ", results.success, " - message: ", results.message)
+    else:
+        results = minimize(log_likelihood, copula.parameters_start, method=opti_method, bounds=copula.bounds_param, options=options)
+        # print("method:", opti_method, "- success:", results.success, ":", results.message)
         if results.success == True:
             return (results.x, -results.fun)
-
-        print("optimization failed")
-        return None
+        else:
+            print(results)
+            print("optimization failed")
+            return None
 
 
 def fit_cmle_mixt(copula, data, opti_method='SLSQP'):
@@ -124,7 +134,7 @@ def fit_cmle_mixt(copula, data, opti_method='SLSQP'):
         results = minimize(log_likelihood, copula.parameters_start, method=opti_method, bounds=copula.bounds_param, constraints=cons) #options={'maxiter': 300})#.x[0]
 
 
-    print("method = ", opti_method, " - termination = ", results.success, " - message: ", results.message)
+        print("method:", opti_method, "- success:", results.success, ":", results.message)
     if results.success == True:
         return (results.x, -results.fun)
 
@@ -182,7 +192,6 @@ def fit_mle(data, copula, marginals, opti_method='SLSQP', known_parameters=False
         logi = lambda  i, theta: np.log(copula.get_pdf(marg_cdf1(i),marg_cdf2(i),[theta]))+np.log(marg_pdf1(i)) +np.log(marg_pdf2(i))
         log_likelihood = lambda  theta:  -sum([logi(i, theta)  for i in range(0,len(data[0]))])
 
-
         results = minimize(log_likelihood, copula.parameters_start, method=opti_method, )# options={'maxiter': 300})#.x[0]
 
     else:
@@ -202,13 +211,12 @@ def fit_mle(data, copula, marginals, opti_method='SLSQP', known_parameters=False
 
         results = minimize(log_likelihood, (copula.parameters_start, np.array(0), np.array(1), np.array(0), np.array(1)), method=opti_method, )# options={'maxiter': 300})#.x[0]
 
-    print("method = ", opti_method, " - termination = ", results.success, " - message: ", results.message)
+    print("method:", opti_method, "- success:", results.success, ":", results.message)
     if results.success == True:
         return results.x
 
     print("Optimization failed")
     return None
-
 
 
 def IAD_dist(copula, data, theta):
