@@ -3,7 +3,6 @@ import numpy as np
 from scipy import linalg
 from scipy.stats import norm, t, levy_stable, logser
 from scipy.special import gamma, comb
-from distutils.log import error
 from typing import List
 
 

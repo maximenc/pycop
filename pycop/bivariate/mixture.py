@@ -1,4 +1,3 @@
-from distutils.log import error
 import numpy as np
 from pycop.bivariate.copula import copula
 from pycop.bivariate.archimedean import archimedean
@@ -169,30 +168,31 @@ class mixture(copula):
 
         return pdf
 
-    def LTDC(self, w1, theta1):
+    def LTDC(self, theta, weight):
         """
         # Computes the upper TDC
 
         Parameters
         ----------
-        w1 : float
+        weight : float
             The weight associated to the copula with Lower Tail Dependence 
-        theta1 : float
+        theta : float
             The parameter of the copula with Lower Tail Dependence
         """
-        return self.cop1.LTDC(theta1)*w1
+        return self.cop[0].LTDC(theta)*weight
 
-    def UTDC(self, w2, theta2):
+    def UTDC(self, theta, weight):
         """
         # Computes the upper TDC
 
         Parameters
         ----------
-        w2 : float
+        weight : float
             The weight associated to the copula with Upper Tail Dependence 
-        theta2 : float
+        theta : float
             The parameter of the copula with Upper Tail Dependence
         """
-        return self.cop2.UTDC(theta2)*w2
+        return self.cop[-1].UTDC(theta)*weight
+
 
 

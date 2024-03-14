@@ -158,7 +158,7 @@ cop.plot_mpdf([2], marginals, plot_type="3d",Nsplit=100,
 
 lvls = [0.02, 0.05, 0.1, 0.2, 0.3]
 
-cop.plot_mpdf([2], marginals, plot_type="contour", Nsplit=100,  lvls=lvls)
+cop.plot_mpdf([2], marginals, plot_type="contour", Nsplit=100,  levels=lvls)
 ```
 
 
@@ -172,10 +172,10 @@ cop.plot_mpdf([2], marginals, plot_type="contour", Nsplit=100,  lvls=lvls)
 mixture of 2 copulas
 
 ```python
-from pycop.mixture import mixture
+from pycop import mixture
 
 cop = mixture(["clayton", "gumbel"])
-cop.plot_pdf([0.2, 2, 2],  plot_type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6] )
+cop.plot_pdf([0.2, 2, 2],  plot_type="contour", Nsplit=40,  levels=[0.1,0.4,0.8,1.3,1.6] )
 # plot with defined marginals
 cop.plot_mpdf([0.2, 2, 2], marginals, plot_type="contour", Nsplit=50)
 ```
@@ -187,8 +187,8 @@ cop.plot_mpdf([0.2, 2, 2], marginals, plot_type="contour", Nsplit=50)
 
 ```python
 
-cop = mixture(["clayton","gaussian", "gumbel"])
-cop.plot_pdf([1/3, 1/3, 1/3, 2, 0.5, 4],  plot_type="contour", Nsplit=40,  lvls=[0.1,0.4,0.8,1.3,1.6] )
+cop = mixture(["clayton", "gaussian", "gumbel"])
+cop.plot_pdf([1/3, 1/3, 1/3, 2, 0.5, 4],  plot_type="contour", Nsplit=40,  levels=[0.1,0.4,0.8,1.3,1.6] )
 cop.plot_mpdf([1/3, 1/3, 1/3, 2, 0.5, 2], marginals, plot_type="contour", Nsplit=50)
 ```
 <p align="center">
@@ -230,8 +230,6 @@ u1, u2 = simulation.simu_tstudent(n, m, corrMatrix, nu=1)
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/gaussian_simu.svg" width="45%" />
   <img src="https://github.com/maximenc/pycop/raw/master/docs/images/simu/student_simu.svg" width="45%" />
 </p>
-
-
 
 
 
@@ -351,8 +349,9 @@ df = df.dropna()
 ```python
 from pycop import estimation, archimedean
 
-cop = archimedean.archimedean("clayton")
-param, cmle = estimation.fit_cmle(cop, df[["US","UK"]])
+cop = archimedean("clayton")
+data = df[["US","UK"]].T.values
+param, cmle = estimation.fit_cmle(cop, data)
 
 ```
 clayton  estim:  0.8025977727691012
@@ -364,19 +363,34 @@ clayton  estim:  0.8025977727691012
 ## Theoretical TDC
 
 ```python
-cop.LTDC(theta=param)
-cop.UTDC(theta=param)
+from pycop import archimedean
+
+cop = archimedean("clayton")
+
+cop.LTDC(theta=0.5)
+cop.UTDC(theta=0.5)
 ```
 
+For a mixture copula, the copula with lower tail dependence comes first, and the one with upper tail dependence is last.
+
+```python
+from pycop import mixture
+
+cop = mixture(["clayton", "gaussian", "gumbel"])
+
+LTDC = cop.LTDC(weight = 0.2, theta = 0.5) 
+UTDC = cop.UTDC(weight = 0.2, theta = 1.5) 
+```
 
 ## Non-parametric TDC
 Create an empirical copula object
 ```python
 from pycop import empirical
 
-cop = empirical(df[["US","UK"]])
+cop = empirical(df[["US","UK"]].T.values)
 ```
 Compute the non-parametric Upper TDC (UTDC) or the Lower TDC (LTDC) for a given threshold:
+
 ```python
 cop.LTDC(0.01) # i/n = 1%
 cop.UTDC(0.99) # i/n = 99%

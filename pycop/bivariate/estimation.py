@@ -1,8 +1,5 @@
-from distutils.log import error
-import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
-from statsmodels.distributions.empirical_distribution import ECDF
 from scipy.stats import norm, t
 
 import warnings
@@ -26,13 +23,11 @@ def pseudo_obs(data):
 
     """
 
-    ecdf1 = ECDF(data[0])
-    ecdf2 = ECDF(data[1])
+    n = len(data[0])  # Assuming data[0] and data[1] are of the same length
 
-    n = len(data[0])
+    scaled_rank = lambda values: (np.argsort(np.argsort(values)) + 1) / (n + 1)
 
-    scaled_ranks = np.array(
-        [[n * l / (n + 1) for l in ecdf1(data[0])], [n * l / (n + 1) for l in ecdf2(data[1])]])
+    scaled_ranks = np.array([scaled_rank(data[0]), scaled_rank(data[1])])
 
     return scaled_ranks
 
@@ -91,7 +86,7 @@ def fit_cmle(copula, data, opti_method='SLSQP', options={}):
             return None
 
 
-def fit_cmle_mixt(copula, data, opti_method='SLSQP'):
+def fit_cmle_mixt(copula, data, opti_method='SLSQP', options={}):
     """
     # Compute the CMLE for a mixture copula using the pseudo-observations
 
@@ -120,21 +115,20 @@ def fit_cmle_mixt(copula, data, opti_method='SLSQP'):
         else: # dim = 3
             w1, w2, w3, param1, param2, param3 = parameters
             params = [w1, w2, w3, param1, param2, param3]
-        logl = -sum([ np.log(copula.get_pdf(psd_obs[0][i],psd_obs[1][i],params)) for i in range(0,len(psd_obs[0]))])
+        logl = -sum([ np.log(copula.get_pdf(psd_obs[0][i], psd_obs[1][i],params)) for i in range(0, len(psd_obs[0]))])
         return logl
 
-    def con(parameters):
-        w1, w2, w3, param1, param2, param3 = parameters
-        return 1 - w1 - w2 - w3
+    # copula.dim gives the number of weights to consider
+    cons = [{'type': 'eq', 'fun': lambda parameters: np.sum(parameters[:copula.dim]) - 1}]
 
-    if copula.dim == 2:
-        results = minimize(log_likelihood, copula.parameters_start, method=opti_method, bounds=copula.bounds_param) #options={'maxiter': 300})#.x[0]
-    else:
-        cons = {'type':'eq', 'fun': con}
-        results = minimize(log_likelihood, copula.parameters_start, method=opti_method, bounds=copula.bounds_param, constraints=cons) #options={'maxiter': 300})#.x[0]
+    results = minimize(log_likelihood,
+                       copula.parameters_start,
+                       method=opti_method,
+                       bounds=copula.bounds_param,
+                       constraints=cons,
+                       options=options)
 
-
-        print("method:", opti_method, "- success:", results.success, ":", results.message)
+    #print("method:", opti_method, "- success:", results.success, ":", results.message)
     if results.success == True:
         return (results.x, -results.fun)
 
@@ -179,7 +173,7 @@ def fit_mle(data, copula, marginals, opti_method='SLSQP', known_parameters=False
 
     if copula.type == "mixture":
         print("estimation of mixture only available with CMLE try fit mle")
-        raise error
+        raise ValueError
     
     if known_parameters == True:
 
@@ -218,45 +212,75 @@ def fit_mle(data, copula, marginals, opti_method='SLSQP', known_parameters=False
     print("Optimization failed")
     return None
 
+def IAD_dist(copula, data, param):
+    """
+    Compute the Integrated Anderson-Darling (IAD) distance between 
+    the parametric copula and the empirical copula with vectorization.
 
-def IAD_dist(copula, data, theta):
+    Info:
+        This function first computes the empirical copula. It then computes the 
+        theoretical (parametric) copula values using the provided copula function 
+        and parameters. The IAD distance is calculated based on the differences 
+        between these two copulas.    
+        Based on equation 9 in "Crash Sensitivity and the Cross Section of Expected
+        Stock Returns" (2018) Journal of Financial and Quantitative Analysis
 
-    ranks = data
-    order_u = ranks.iloc[:,0].argsort()
-    order_v = ranks.iloc[:,1].argsort()
-    ranks.iloc[:,0] = order_u.argsort()
-    ranks.iloc[:,1] = order_v.argsort()
+    Args:
+        copula (function): The copula object, providing a method `get_cdf` to compute the CDF.
+        data (array-like): The underlying data as a 2D array, where each row is a dimension.
+        param (array-like): The parameters of the copula.
 
-    def C_emp(i,j,ranks):
-        return 1/n * len(ranks.loc[(ranks.iloc[:,0]<= i ) & (ranks.iloc[:,1] <= j) ])
+    Returns:
+        float: The IAD distance between the empirical and the parametric copulas.
+    """
+    
+    n = len(data[0])
+    
+    # Get the order statistics for each dimension
+    sorted_u = np.sort(data[0])
+    sorted_v = np.sort(data[1])
 
-    n = len(data)
-    IAD = 0
-    for i in range(1,n):
-        for j in range(1,n):
-            C_ = C_emp(i,j,ranks)
-            C = copula.cdf((i/n),(j/n),theta)
-            IAD = IAD + ((C_-C)**2)/(C*(1-C))
+    # Create a grid of comparisons for each pair (u, v)
+    u_grid, v_grid = np.meshgrid(sorted_u, sorted_v, indexing='ij')
+    
+    # Count the number of points below the threshold in both dimensions
+    # Use broadcasting to compare all pairs and count
+    counts = np.sum((data[0][:, None, None] <= u_grid) & (data[1][:, None, None] <= v_grid), axis=0)
+    # Compute the empirical copula
+    C_empirical = counts / n
+    
+    # Prepare the grid for computing the parametric copula
+    x_values, y_values = np.linspace(1/n, 1-1/n, n), np.linspace(1/n, 1-1/n, n)
+
+    # Compute the parametric (theoretical) copula values
+    C_copula = np.array([[copula.get_cdf(x, y, param) for x in x_values] for y in y_values])
+
+    # Calculate the Integrated Anderson-Darling distance
+    IAD = np.sum(((C_empirical - C_copula) ** 2) / (C_copula - C_copula**2))
+
     return IAD
 
 
-def AD_dist(copula, data, theta):
+def AD_dist(copula, data, param):
+    """
+    Compute the Anderson-Darling (IAD) distance between the parametric
+    copula and the empirical copula with vectorization.
 
-    ranks = data
-    order_u = ranks.iloc[:,0].argsort()
-    order_v = ranks.iloc[:,1].argsort()
-    ranks.iloc[:,0] = order_u.argsort()
-    ranks.iloc[:,1] = order_v.argsort()
+    Same principle as IAD_dist()
+    """
+    
+    n = len(data[0])
+    
+    sorted_u = np.sort(data[0])
+    sorted_v = np.sort(data[1])
 
-    def C_emp(i,j,ranks):
-        return 1/n * len(ranks.loc[(ranks.iloc[:,0]<= i ) & (ranks.iloc[:,1] <= j) ])
+    u_grid, v_grid = np.meshgrid(sorted_u, sorted_v, indexing='ij')
+    
+    counts = np.sum((data[0][:, None, None] <= u_grid) & (data[1][:, None, None] <= v_grid), axis=0)
+    C_empirical = counts / n
+    
+    x_values, y_values = np.linspace(1/n, 1-1/n, n), np.linspace(1/n, 1-1/n, n)
+    C_copula = np.array([[copula.get_cdf(x, y, param) for x in x_values] for y in y_values])
 
-    n = len(data)
-    AD_lst = []
-    for i in range(1,n):
-        for j in range(1,n):
-            C_ = C_emp(i,j,ranks)
-            C = copula.cdf((i/n),(j/n),theta)
-            term = abs(C_ - C)/np.sqrt(C*(1-C))
-            AD_lst.append(term)
-    return max(AD_lst)
+    AD = np.max(((C_empirical - C_copula) ** 2) / (C_copula - C_copula**2))
+    return AD

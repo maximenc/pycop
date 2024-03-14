@@ -1,6 +1,4 @@
 import numpy as np
-import pandas as pd
-
 import matplotlib.pyplot as plt
 
 def plot_bivariate(U,V,Z):
@@ -17,8 +15,8 @@ class empirical():
 
     Attributes
     ----------
-    data : pandas dataframe
-        A dataframe with two columns that corresponds to the observations
+    data : numpy array
+        A numpy array with two vectors that corresponds to the observations
     n : int
         The number of observations
 
@@ -44,14 +42,12 @@ class empirical():
         """
         Parameters
         ----------
-        data : pandas dataframe
-            A dataframe with two columns that corresponds to the observations.
+        data : numpy array
         """
         self.data = data
-        self.n = len(data)
-        
+        self.n = len(data[0])
 
-    def cdf(self, i_n, j_n):
+    def get_cdf(self, i_n, j_n):
         """
         # Compute the CDF
 
@@ -63,11 +59,18 @@ class empirical():
             The threshold to compute the univariate distribution for the second vector.
         """
 
+        # Calculate rank indices for both vectors
         i = int(round(self.n * i_n))
         j = int(round(self.n * j_n))
-        ith_order_u = sorted(np.asarray(self.data.iloc[:,0].values))[i-1]
-        jth_order_v = sorted(np.asarray(self.data.iloc[:,1].values))[j-1]
-        return (1/self.n) * len(self.data.loc[(self.data.iloc[:,0] <= ith_order_u ) & (self.data.iloc[:,1] <= jth_order_v) ])
+
+        ith_order_u = sorted(self.data[0])[i-1]
+        ith_order_v = sorted(self.data[1])[j-1]
+
+        # Find indices where both vectors are less than the corresponding rank indices
+        mask_x = self.data[0] <= ith_order_u
+        mask_y = self.data[1] <= ith_order_v
+
+        return np.sum(np.logical_and(mask_x, mask_y)) / self.n
 
     def LTDC(self, i_n):
         """
@@ -76,14 +79,13 @@ class empirical():
         Parameters
         ----------
         i_n : float
-            The threshold to compute the TDC
+            The threshold to compute the lower TDC.
         """
-
-        i = int(round(self.n * i_n))
-
-        if i == 0:
+        
+        if int(round(self.n * i_n)) == 0:
             return 0
-        return self.cdf(i_n,i_n)/(i/self.n)
+        
+        return self.get_cdf(i_n, i_n) / i_n
 
     def UTDC(self, i_n):
         """
@@ -92,13 +94,11 @@ class empirical():
         Parameters
         ----------
         i_n : float
-            The threshold to compute the TDC
+            The threshold to compute the upper TDC.
         """
+        
+        return (1 - 2 * i_n + self.get_cdf(i_n, i_n) ) / (1-i_n)
 
-        i = int(round(self.n * i_n))
-        if i == 0:
-            return 0
-        return (1- 2*(i/self.n) + self.cdf(i_n,i_n) ) / (1-(i/self.n))
 
     def plot_cdf(self, Nsplit):
         """
@@ -112,7 +112,7 @@ class empirical():
         V_grid = np.linspace(0, 1, Nsplit)[:-1]
         U_grid, V_grid = np.meshgrid(U_grid, V_grid)
         Z = np.array( 
-            [self.cdf(uu, vv) for uu, vv in zip(np.ravel(U_grid), np.ravel(V_grid)) ] )
+            [self.get_cdf(uu, vv) for uu, vv in zip(np.ravel(U_grid), np.ravel(V_grid)) ] )
         Z = Z.reshape(U_grid.shape)
         plot_bivariate(U_grid,V_grid,Z)
 
@@ -125,30 +125,27 @@ class empirical():
         Nsplit : The number of splits used to compute the grid
         """
 
-        U_grid = np.linspace(
-            min(self.data.iloc[:,0]),
-            max(self.data.iloc[:,0]),
-            Nsplit)
-        V_grid = np.linspace(
-            min(self.data.iloc[:,1]),
-            max(self.data.iloc[:,1]),
-            Nsplit)
+        U_grid = np.linspace(self.data[0].min(), self.data[0].max(), Nsplit)
+        V_grid = np.linspace(self.data[1].min(), self.data[1].max(), Nsplit)
 
-        df = pd.DataFrame(index=U_grid, columns=V_grid)
-        df = df.fillna(0)
-        for i in range(0,Nsplit-1):
-            for j in range(0,Nsplit-1):
-                Xa = U_grid[i]
-                Xb = U_grid[i+1]
-                Ya = V_grid[j]
-                Yb = V_grid[j+1]
-                df.at[Xa,Ya] = len(self.data.loc[( Xa <= self.data.iloc[:,0]) & (self.data.iloc[:,0] < Xb) & ( Ya <= self.data.iloc[:,1]) & (self.data.iloc[:,1]< Yb)])
-        df.index=df.index+(U_grid[0]-U_grid[1])/2
-        df.columns = df.columns+ (V_grid[0]-V_grid[1])/2 
-        df = df /len(self.data)
+        # Initialize a matrix to hold the counts
+        counts = np.zeros((Nsplit, Nsplit))
 
-        U, V = np.meshgrid(U_grid, V_grid)   # Create coordinate points of X and Y
-        Z = np.array(df)
+        for i in range(Nsplit-1):
+            for j in range(Nsplit-1):
+                # Define the edges of the bin
+                Xa, Xb = U_grid[i], U_grid[i + 1]
+                Ya, Yb = V_grid[j], V_grid[j + 1]
+
+                # Use boolean indexing to count points within the bin
+                mask = (Xa <= self.data[0]) & (self.data[0] < Xb) & (Ya <= self.data[1]) & (self.data[1] < Yb)
+                counts[i, j] = np.sum(mask)
+        # Adjust the grid centers for plotting
+        U_grid_centered = U_grid + (U_grid[1] - U_grid[0]) / 2
+        V_grid_centered = V_grid + (V_grid[1] - V_grid[0]) / 2
+        
+        U, V = np.meshgrid(U_grid_centered, V_grid_centered)   # Create coordinate points of X and Y
+        Z = counts / np.sum(counts)
 
         plot_bivariate(U,V,Z)
     
@@ -166,55 +163,53 @@ class empirical():
             takes "upper" or "lower" for upper TDC or lower TDC
         """
 
-        data = self.data #creates a copy 
-        data.reset_index(inplace=True,drop=True)
-        #data["TDC"] = np.NaN
-        #data["TDC_smoothed"] = np.NaN
-        n = len(self.data)
-        b = int(n/200) # length to apply a moving average on 2b + 1 consecutive points
+        #### 1) The series of TDC is smoothed using a box kernel with bandwidth b ∈ N
+        # Consists in applying a moving average on 2b + 1 consecutive points
+        tdc_array = np.zeros((self.n,))
+        
         # b is chosen such that ~1% of the data fall into the mooving average
-
+        b = int(np.ceil(self.n/200)) 
+        
         if case == "upper":
             # Compute the Upper TDC for every possible threshold i/n
-            for i in range(1,n-1):
-                data.at[i,"TDC"] = self.UTDC(i_n=i/n)        
-            data = data.iloc[::-1] # Reverse the order, the plateau finding algorithm starts with lower values
-            data.reset_index(inplace=True,drop=True)
+            for i in range(1, self.n-1):
+                tdc_array[i] = self.UTDC(i_n=i/self.n)
+            # We reverse the order, the plateau finding algorithm starts with lower values
+            tdc_array = tdc_array[::-1]
 
         elif case =="lower":
             # Compute the Lower TDC for every possible threshold i/n
-            for i in range(1,n-1):
-                data.at[i,"TDC"] = self.LTDC(i_n=i/n)
+            for i in range(1, self.n-1):
+                tdc_array[i] = self.LTDC(i_n=i/self.n)
         else:
             print("Takes \"upper\" or \"lower\" argument only")
             return None 
 
-        # Smooth the TDC with a mooving average of lenght 2*b+1
-        for i in range(b,n-b):
-            TDC_smooth = 0
-            for j in range(i-b,i+b+1):
-                TDC_smooth = TDC_smooth +data.at[j,"TDC"]
-            TDC_smooth = TDC_smooth/(2*b+1)  
-            data.at[i,"TDC_smoothed"] = TDC_smooth
+        # Smooth the TDC with a mooving average of lenght 2b+1
+        # The total lenght = n-2b-1 because i ∈ [1, n−2b]
+        tdc_smooth_array = np.zeros((self.n-2*b-1,))
+        
+        for i, j in zip(range(b+1, self.n-b), range(0, self.n-2*b-1)):
+            tdc_smooth_array[j] = sum(tdc_array[i-b:i+b+1]) / (2*b+1)  
 
-        m = int(np.sqrt(n-2*b) ) # lenght of the plateau
-        std = data["TDC_smoothed"].std() # the standard deviation of the smoothed series
-        #data["cond"] = np.NaN # column that will contains the condition: plateau - 2*sigma
+        #### 2) We select a vector of m consecutive estimates that satisfies a plateau condition
+        
+        # m = lenght of the plateau = number of consecutive smoothed TDC estimates
+        m = int(np.floor(np.sqrt(self.n-2*b))) 
+        # The standard deviation of the smoothed TDC series
+        std_tdc_smooth = tdc_smooth_array.std() 
 
-        for k in range(0,n-2*b-m+1): #change the range from 0 ?
+        # We iterate k from 0 to n-2b-m because k ∈ [1, n−2b−m+1]
+        for k in range(0,self.n-2*b-m): 
             plateau = 0
-            for i in range(k+1,k+m-1+1):
-                plateau = plateau + np.abs(data.at[i,"TDC_smoothed"] - data.at[k,"TDC_smoothed"])
-            data.at[k,"cond"] = plateau - 2*std
-
-        # Finding the first k such that: plateau - 2*sigma <= 0
-        k = data.loc[ data.cond <= 0,:].index[0]
-
-        # The optimal TDC is defined as the average of the corresponding plateau
-        plateau_k = 0
-        for i in range(1,m-1+1):
-            plateau_k = plateau_k + data.at[k+i-1,"TDC_smoothed"] 
-        TDC_ = plateau_k/m
-
-        print("Optimal threshold: ", k/n)
-        return TDC_
+            for i in range(1,m-1):
+                plateau = plateau + np.abs(tdc_smooth_array[k+i] - tdc_smooth_array[k])
+            # if the plateau satisfies the following condition:
+            if plateau <= 2*std_tdc_smooth:
+                #### 3) Then, the TDC estimator is defined as the average of the estimators in the corresponding plateau
+                avg_tdc_plateau = np.mean(tdc_smooth_array[k:k+m-1])
+                print("Optimal threshold: ", k/self.n)
+                return avg_tdc_plateau
+        
+        # In case the condition is not satisfied the TDC estimate is set to zero
+        return 0
