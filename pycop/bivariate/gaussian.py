@@ -52,7 +52,7 @@ class gaussian(copula):
         y2 = norm.ppf(v, 0, 1)
         rho = param[0]
 
-        return multivariate_normal.cdf((y1,y2), mean=None, cov=[[1, rho], [rho, 1]])
+        return multivariate_normal.cdf(np.array([y1, y2]).T, mean=None, cov=[[1, rho], [rho, 1]])
 
     def get_pdf(self, u, v, param):
         """

@@ -115,7 +115,7 @@ def fit_cmle_mixt(copula, data, opti_method='SLSQP', options={}):
         else: # dim = 3
             w1, w2, w3, param1, param2, param3 = parameters
             params = [w1, w2, w3, param1, param2, param3]
-        logl = -sum([ np.log(copula.get_pdf(psd_obs[0][i], psd_obs[1][i],params)) for i in range(0, len(psd_obs[0]))])
+        logl = -np.sum(np.log(copula.get_pdf(psd_obs[0], psd_obs[1], params)))
         return logl
 
     # copula.dim gives the number of weights to consider
@@ -253,8 +253,12 @@ def IAD_dist(copula, data, param):
     x_values, y_values = np.linspace(1/n, 1-1/n, n), np.linspace(1/n, 1-1/n, n)
 
     # Compute the parametric (theoretical) copula values
-    C_copula = np.array([[copula.get_cdf(x, y, param) for x in x_values] for y in y_values])
+    u_flat = np.array([[x for x in x_values] for y in y_values]).flatten()
+    v_flat = np.array([[y for x in x_values] for y in y_values]).flatten()
 
+    C_copula = copula.get_cdf(np.array(u_flat), np.array(v_flat), param)
+    C_copula = C_copula.reshape((n,n))
+    
     # Calculate the Integrated Anderson-Darling distance
     IAD = np.sum(((C_empirical - C_copula) ** 2) / (C_copula - C_copula**2))
 
@@ -280,7 +284,12 @@ def AD_dist(copula, data, param):
     C_empirical = counts / n
     
     x_values, y_values = np.linspace(1/n, 1-1/n, n), np.linspace(1/n, 1-1/n, n)
-    C_copula = np.array([[copula.get_cdf(x, y, param) for x in x_values] for y in y_values])
+    
+    u_flat = np.array([[x for x in x_values] for y in y_values]).flatten()
+    v_flat = np.array([[y for x in x_values] for y in y_values]).flatten()
 
+    C_copula = copula.get_cdf(np.array(u_flat), np.array(v_flat), param)
+    C_copula = C_copula.reshape((n,n))
+    
     AD = np.max(((C_empirical - C_copula) ** 2) / (C_copula - C_copula**2))
     return AD
