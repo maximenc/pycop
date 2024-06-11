@@ -8,6 +8,21 @@
 [![License](https://img.shields.io/pypi/l/pycop)](https://img.shields.io/pypi/l/pycop)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7030034.svg)](https://doi.org/10.5281/zenodo.7030034)
 
+# How to cite
+
+If you use pycop in a scientific publication
+```
+@article{nicolas2022pycop,
+  title={pycop: a Python package for dependence modeling with copulas},
+  author={Nicolas, Maxime LD},
+  journal={Zenodo Software Package},
+  volume={70},
+  pages={7030034},
+  year={2022}
+}
+```
+
+
 # Overview
 
 Pycop is the most complete tool for modeling multivariate dependence with Python. The package provides methods such as estimation, random sample generation, and graphical representation for commonly used copula functions. The package supports the use of mixture models defined as convex combinations of copulas. Other methods based on the empirical copula such as the non-parametric Tail Dependence Coefficient are given.
